@@ -1,6 +1,6 @@
 from django.db import models
 
-from crowd_funding.accounts.models import User
+from accounts.models import User
 
 
 class Category(models.Model):
@@ -57,7 +57,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
+    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Comment by {self.user.email} on {self.project.title}"
