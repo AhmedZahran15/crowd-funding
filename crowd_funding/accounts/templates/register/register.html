@@ -5,35 +5,210 @@
     <meta charset="UTF-8">
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        body { background-color: #f8fff8; }
+        body {
+            background: linear-gradient(rgba(34, 49, 63, 0.7), rgba(34, 49, 63, 0.7)), url('{% static "images/gofundme-bg.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
         .register-box {
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 30px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 128, 0, 0.2);
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            margin-top:30px;
+            margin-bottom:30px;
         }
-        .btn-green {
-            background-color: #28a745;
-            color: white;
+
+        .register-box h3 {
+            font-weight: bold;
+            color: #198754;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
-        .btn-green:hover {
-            background-color: #218838;
+
+        .register-box p {
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #222;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            min-height: 50px;
+            font-size: 1.05rem;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25,135,84,.15);
+        }
+
+        .btn-register {
+            min-height: 55px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #198754 60%, #43e97b 100%);
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(90deg, #43e97b 60%, #198754 100%);
+        }
+
+        .alert {
+            border-radius: 8px;
+            font-size: 0.98rem;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0 20px 0;
+            position: relative;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            height: 1px;
+            width: 38%;
+            background: #ccc;
+            position: absolute;
+            top: 50%;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .divider span {
+            padding: 0 12px;
+            position: relative;
+            z-index: 1;
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .social-btns {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .btn-google {
+            background: #fff;
+            border: 1px solid #ddd;
+            color: #ea4335;
+            flex: 1;
+            font-weight: 500;
+            border-radius: 10px;
+            min-height: 50px;
+        }
+
+        .btn-facebook {
+            background: #1877f2;
+            color: #fff;
+            border: none;
+            flex: 1;
+            font-weight: 500;
+            border-radius: 10px;
+            min-height: 50px;
+        }
+
+        .login-link {
+            color: #198754;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .login-link:hover {
+            color: #145db2;
         }
     </style>
 </head>
 <body>
-    <div class="register-box">
-        <h2 class="text-center text-success mb-4">Create Your Account</h2>
-        <form method="post" enctype="multipart/form-data">
+    <div class="register-box text-center ">
+        <h3><i class="fa-solid fa-leaf me-2"></i>Create Your Account</h3>
+        <p>Join <span class="fw-bold text-success">Fund Me</span> and start your journey.</p>
+
+        <div class="social-btns mb-3 ">
+            <a href="#" class="btn btn-google flex align-content-center"><i class="fab fa-google me-2 "></i>Google</a>
+            <a href="#" class="btn btn-facebook flex align-content-center"><i class="fab fa-facebook-f me-2"></i>Facebook</a>
+        </div>
+
+        <div class="divider"><span>or register with email</span></div>
+
+        <form method="post" enctype="multipart/form-data" class="text-start">
             {% csrf_token %}
-            {{ form.as_p }}
-            <div class="d-grid">
-                <button type="submit" class="btn btn-green">Register</button>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.first_name.label_tag }}
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="text-danger small">{{ form.first_name.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.last_name.label_tag }}
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="text-danger small">{{ form.last_name.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% for field in form %}
+                {% if field.name != "first_name" and field.name != "last_name" %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% if form.password.errors %}
+                <div class="text-danger small">{{ form.password.errors }}</div>
+            {% endif %}
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-success btn-register">Register</button>
             </div>
         </form>
+
+        {% for message in messages %}
+            <div class="alert alert-warning mt-3">{{ message }}</div>
+        {% endfor %}
+
+        <div class="mt-4">
+            <p>Already have an account?
+                <a href="{% url 'login' %}" class="login-link">
+                    Login here
+                </a>
+            </p>
+        </div>
     </div>
 </body>
 </html>
