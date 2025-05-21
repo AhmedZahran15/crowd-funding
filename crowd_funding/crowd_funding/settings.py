@@ -56,7 +56,7 @@ ROOT_URLCONF = 'crowd_funding.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'crowd_funding' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
