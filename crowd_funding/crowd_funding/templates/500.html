@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% load static %} {% block title %}Server Error -
+Sharikna{% endblock %} {% block content %}
+<div class="container py-5 text-center" style="margin-top: 80px">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="error-container py-5">
+        <h1 class="display-1 text-danger">500</h1>
+        <h2 class="mb-4">Oops! Something went wrong</h2>
+        <p class="lead mb-5">
+          We're experiencing some technical difficulties. Our team has been
+          notified and is working to fix the issue. Please try again later.
+        </p>
+        <div class="mt-4">
+          <a href="{% url 'home' %}" class="btn btn-success btn-lg">
+            <i class="bi bi-house-door me-2"></i>Go to Homepage
+          </a>
+          <a
+            href="javascript:history.back()"
+            class="btn btn-outline-secondary btn-lg ms-3"
+          >
+            <i class="bi bi-arrow-left me-2"></i>Go Back
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
