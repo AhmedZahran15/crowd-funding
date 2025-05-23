@@ -1,0 +1,109 @@
+
+.heroImg{
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  line-height: 1.8;
+  background-image: url('/static/images/img3.jpg') ;
+  padding-top: 80px;
+  padding-bottom: 80px;
+  z-index: 2; 
+  position: relative;
+}
+.bg-cover{
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment:fixed ;
+}
+
+h1,h2,h3,h4,h5,h6{
+  font-weight: 800  !important;
+
+}
+a{
+  text-decoration: none;
+   transition: all 0.4s ease;
+   font-weight: 800;
+}
+.navbar-add {
+  box-shadow: 0 12px 20px rgba(1, 9, 0, 0.1) !important;;
+}
+.overlay{
+  z-index:  -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:linear-gradient(rgba(10, 26, 1, 0.866),rgba(149, 215, 144, 0.256) );
+
+  }
+.herosection{
+  min-height: 100vh;
+  display: flex ; 
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-main{
+  padding: 14px 22px;
+  border-radius: 100px;
+  border: none;
+  font-weight: 600;
+
+  transition: all 0.4s ease;
+  color: white;
+
+ background:linear-gradient(rgb(41, 108, 2),rgb(70, 163, 63) );
+
+ }
+
+.btn-main:hover{
+  color: white;
+  transform: translateY(-5px);
+}
+.section-intro{
+  margin-top: 20px;
+  padding-bottom:10px ;
+    margin-bottom: 20px;
+    color: green;
+}
+
+.section-intro .divider{
+
+  width: 300px;
+  height: 5px;
+  background:linear-gradient(rgb(48, 123, 4),rgb(149, 215, 144) );
+  margin: 5px auto;
+  border: none;
+} 
+
+
+.card-edit img {
+  border-radius: 10px ;
+  max-width: 90%;
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+  
+}
+
+.card-edit {
+  padding: 10px;
+  border-radius: 20px;
+
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card-edit:hover {
+  box-shadow: 0 20px 16px rgba(0, 0, 0, 0.8);
+  transform: translateY(-5px);
+  z-index: 1000;
+}
+.text-content{
+  margin: 0 auto;
+}
+
+
+
