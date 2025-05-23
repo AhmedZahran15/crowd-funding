@@ -1,0 +1,265 @@
+
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Help Reg Pay Off His Debt{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root{
+        margin: 2em 4em;
+    }
+
+    .carousel-inner {
+    height: 400px; 
+    }
+
+    .carousel-inner img {
+    height: 400px;
+    object-fit: cover; 
+    }
+
+    .link-muted { color: #aaa; } 
+    .link-muted:hover { color: #1266f1; }
+    .hidden-comment {
+    display: none !important;
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container ">
+
+ <div class="row">
+        <div class="col-md-8 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <h2 class="mb-0">
+                Help Reg pay off his debt! <span class="text-primary">#FreeReg</span>
+            </h2>
+            <div class="text-warning d-flex align-items-center fs-4 mt-2">
+                {% for i in "12345" %}
+                    {% if rating|floatformat:1 >= i %}
+                        <i class="bi bi-star-fill"></i>
+                    {% elif rating|floatformat:1 >= i|add:"-0.5" %}
+                        <i class="bi bi-star-half"></i>
+                    {% else %}
+                        <i class="bi bi-star"></i>
+                    {% endif %}
+                {% endfor %}
+                <span class="ms-1 text-dark" style="font-size: 1.2rem;">({{ rating }})</span>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+
+        <!-- Left: Video and Description -->
+    <div class="col-md-8 mt-4">
+
+        <div id="carouselExampleInterval" class="carousel slide "  data-bs-ride="carousel">
+        <div class="carousel-inner rounded-3">
+            <div class="carousel-item active" data-bs-interval="3000">
+            <img src="https://images.unsplash.com/photo-1503264116251-35a269479413?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item" data-bs-interval="3000">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="d-block w-100" alt="...">
+            </div>
+            <div class="carousel-item" data-bs-interval="3000">
+            <img src="https://images.unsplash.com/photo-1503264116251-35a269479413?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="d-block w-100" alt="...">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between">
+            <p class="pt-2 d-flex align-items-center gap-1">
+            <img src="{{ creator.image }}" alt="{{ creator.name }}" class="rounded-circle me-2" width="40" height="40">
+            Organized by <strong> {{ creator.name }}</strong>
+            </p>
+
+            <p class="text-muted">
+                Created on {{ created_at|date:"F j, Y" }}
+            </p>
+        </div>
+
+        <hr/>
+
+        <p class="mt-3" id="desc">
+            <strong>(UPDATE: WE SUCCEEDED!! REG IS FREE!!)</strong><br>
+            <span id="short-text">
+                {{ description|slice:":300" }}...
+            </span>
+            <span id="full-text" style="display:none;">
+                {{ description }}
+            </span>
+            <button id="readMoreBtn" class="btn btn-link p-0 d-block" onclick="toggleReadMore()">Read More</button>
+        </p>
+
+        <div class="d-flex align-items-center">
+            <button class="btn btn-success w-100 my-3">Donate now</button>
+            <button class="btn btn-light w-100 mb-3">Share</button>
+        </div>
+
+
+        <hr/>
+
+                <button class="btn btn-light d-flex align-items-center border rounded-pill px-3 py-2 mt-3 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-flag" viewBox="0 0 16 16">
+                <path
+                    d="M14.778 3.22a.5.5 0 0 1 .222.415v7.304a.5.5 0 0 1-.777.416L10.447 9l-4.553 2.355V14.5a.5.5 0 0 1-1 0V2.5a.5.5 0 0 1 .777-.416L10.553 5l4.003-2.146a.5.5 0 0 1 .222-.055z" />
+            </svg>
+            <span class="ms-2">Report Project</span>
+        </button>
+        
+        <hr/>
+
+<section>
+  <div class="container py-3 text-body">
+    <div class="row d-flex justify-content-center">
+      <div class="col">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="mb-3">Add a Comment</h5>
+            <form method="POST">
+              {% csrf_token %}
+              <div class="mb-3">
+                <input type="text" class="form-control" name="name" placeholder="Your name" required>
+              </div>
+              <div class="mb-3">
+                <textarea class="form-control" name="comment" rows="3" placeholder="Your comment" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+          </div>
+        </div>
+
+<div id="comments-container">
+  {% for c in comments %}
+    <div class="d-flex flex-start mb-4 comment-item {% if forloop.counter0 >= 2 %}hidden-comment{% endif %}" data-index="{{ forloop.counter0 }}">
+      <img class="rounded-circle shadow-1-strong me-3"
+           src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(32).webp"
+           alt="avatar" width="65" height="65" />
+      <div class="card w-100">
+        <div class="card-body p-4">
+          <h5>{{ c.name }}</h5>
+          <p class="small text-muted">{{ c.time }}</p>
+          <p>{{ c.comment }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <a href="#!" class="link-muted me-2"><i class="fas fa-thumbs-up me-1"></i>Like</a>
+              <a href="#!" class="link-muted"><i class="fas fa-thumbs-down me-1"></i>Dislike</a>
+            </div>
+            <a href="#!" class="link-muted"><i class="fas fa-reply me-1"></i> Reply</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Show More Button -->
+<div class="text-center mt-3">
+  <button id="showMoreBtn" class="btn btn-outline-primary">Show More</button>
+</div>
+        <hr/>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+    </div>
+
+    <div class="col-md-4 mt-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4>£180,115 raised</h4>
+                <p class="text-muted">£150K goal · 7.4K donations</p>
+
+                <div class="progress rounded-5" style="height: 20px;">
+                    <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        style="width: {{ percent|floatformat:0 }}%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="{{ percent|floatformat:0 }}"
+                        >
+                        £{{ raised|intcomma }} raised of £{{ goal|intcomma }}
+                    </div>
+                </div>
+
+                <button class="btn btn-success w-100 my-3">Donate now</button>
+                <button class="btn btn-light w-100 mb-3">Share</button>
+
+                <p class="text-purple">📈 1.5K people just donated</p>
+
+
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-outline-secondary w-50">See all Donators</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+   
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleReadMore() {
+    const shortText = document.getElementById('short-text');
+    const fullText = document.getElementById('full-text');
+    const btn = document.getElementById('readMoreBtn');
+    
+    if (fullText.style.display === 'none') {
+      fullText.style.display = 'inline';
+      shortText.style.display = 'none';
+      btn.textContent = 'Read Less';
+    } else {
+      fullText.style.display = 'none';
+      shortText.style.display = 'inline';
+      btn.textContent = 'Read More';
+    }
+  }
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const comments = document.querySelectorAll('.comment-item');
+    const showMoreBtn = document.getElementById('showMoreBtn');
+    let visibleCount = 3;
+
+    showMoreBtn.addEventListener('click', function () {
+      let nextVisible = visibleCount + 3;
+      for (let i = visibleCount; i < nextVisible && i < comments.length; i++) {
+        comments[i].style.display = 'flex';  // or 'block' depending on layout
+      }
+      visibleCount = nextVisible;
+
+      if (visibleCount >= comments.length) {
+        showMoreBtn.style.display = 'none';  // Hide button if all shown
+      }
+    });
+
+    if (comments.length <= 3) {
+      showMoreBtn.style.display = 'none';
+    }
+  });
+
+</script>
+{% endblock %}

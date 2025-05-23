@@ -19,10 +19,13 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from projects.views import fundraiser_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('fundraiser/<int:project_id>/', views.fundraiser_view, name='fundraiser')
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
