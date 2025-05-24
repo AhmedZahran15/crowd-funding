@@ -1,24 +1,16 @@
-
 from django.urls import path
-from .views.comments_views import (
-     CommentListView, CommentCreateView, 
-    CommentUpdateView, CommentDeleteView, 
-    comment_report, 
-)
-from .views.rating_views import (rate_project, ProjectCreateView)
-from .views.projects_views import project_view
-
-app_name = 'projects'
+from . import views
 
 urlpatterns = [
-    path('<int:project_id>/', project_view, name='projects'),
-
-    path('comments/', CommentListView.as_view(), name='comments'),
-    path('comments/add/', CommentCreateView.as_view(), name='comment-add'),
-    path('comments/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment_edit'),
-    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
-    path('comment/<int:comment_id>/report/', comment_report, name='comment_report'),
-    
-    path('rate-project/', rate_project, name='rate-project'),
-    path('', ProjectCreateView.as_view(), name='create-project'),
+    path("", views.project_list, name="project_list"),
+    path("<int:project_id>/", views.project_view, name="projects"),
+    path("<int:project_id>/donate/", views.donation_view, name="donation"),
+    path(
+        "category/<int:category_id>/", views.category_projects, name="category_projects"
+    ),
+    path("create/", views.create_project, name="create_project"),
+    path("<int:project_id>/edit/", views.edit_project, name="edit_project"),
+    path("<int:project_id>/report/", views.report_project, name="report_project"),
+    path("<int:project_id>/rate/", views.rate_project, name="rate_project"),
+    path("<int:project_id>/cancel/", views.cancel_project, name="cancel_project"),
 ]
