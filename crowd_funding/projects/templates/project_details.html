@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ title }}{% endblock %}
+{% block extra_css %}
+<style>
+  .rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+  }
+  
+  .rating-stars label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  
+  .rating-stars label:hover {
+    transform: scale(1.1);
+  }
+  
+  .rating-display {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  
+  .btn-group-custom {
+    gap: 0.5rem;
+  }
+  
+  .card-consistent {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+  }
+  
+  .card-consistent:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  .project-actions {
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .project-actions .btn {
+    transition: all 0.2s ease;
+  }
+  
+  .project-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .comment-avatar {
+    border: 2px solid #dee2e6;
+    transition: transform 0.2s ease;
+  }
+  
+  .comment-avatar:hover {
+    transform: scale(1.05);
+  }
+    
+  .progress-custom {
+    height: 20px;
+    border-radius: 10px;
+    background-color: #e9ecef;
+    overflow: hidden;
+  }
+  
+  .progress-custom .progress-bar {
+    transition: width 0.6s ease;
+  }
+  
+  .carousel-item img {
+    height: 400px;
+    object-fit: cover;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 5%;
+    background: linear-gradient(to right, rgba(0,0,0,0.25), transparent);
+  }
+  
+  .carousel-control-next {
+    background: linear-gradient(to left, rgba(0,0,0,0.25), transparent);
+  }
+  
+  .badge {
+    font-size: 0.875em;
+  }
+  
+  .list-group-item {
+    border-left: none;
+    border-right: none;
+  }
+  
+  .list-group-item:first-child {
+    border-top: none;
+  }
+  
+  .list-group-item:last-child {
+    border-bottom: none;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div
+      class="col-md-8 d-flex align-items-center justify-content-between flex-wrap gap-2"
+    >
+      <div>
+        <h2 class="mb-0">{{ title }}</h2>
+        {% if project.status != 'active' %}
+        <div
+          class="badge {% if project.status == 'cancelled' %}bg-danger{% else %}bg-success{% endif %} mb-2"
+        >
+          {{ project.status|title }}
+        </div>
+        {% endif %}
+      </div>
+      <div class="text-warning d-flex align-items-center fs-4 mt-2 rating-display">
+        {% for i in "12345" %}
+        {% if forloop.counter <= rating|floatformat:0 %}
+        <i class="bi bi-star-fill"></i>
+        {% else %}
+        <i class="bi bi-star"></i>
+        {% endif %}
+        {% endfor %}
+        <span class="ms-2 text-dark" style="font-size: 1.2rem"
+          >({{ rating|floatformat:1 }})</span
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8 mt-4">
+      <div
+        id="carouselExampleInterval"
+        class="carousel slide"
+        data-bs-ride="carousel"
+      >
+        <div class="carousel-inner rounded-3">
+          {% if project.images.all %} {% for image in project.images.all %}
+
+          <div
+            class="carousel-item {% if forloop.first %}active{% endif %}"
+            data-bs-interval="3000"
+          >
+            <img src="{{ image.image.url }}" class="d-block w-100" alt="..." />
+          </div>
+          {% endfor %} {% else %}
+          <div class="carousel-item active">
+            <div
+              class="bg-light d-flex align-items-center justify-content-center"
+              style="height: 400px"
+            >
+              <div class="text-center">
+                <i class="bi bi-image text-muted" style="font-size: 5rem"></i>
+                <p class="mt-3 text-muted">
+                  No images available for this project
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% if project.images.all.count > 1 %}
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#carouselExampleInterval"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#carouselExampleInterval"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+        {% endif %}
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between">
+        <p class="pt-2 d-flex align-items-center gap-1">
+          <img
+            src="{{ creator.image.url }}"
+            alt="{{ creator.name }}"
+            class="rounded-circle me-2"
+            width="40"
+            height="40"
+          />
+          Organized by <strong> {{ creator.name }}</strong>
+        </p>
+
+        <p class="text-muted">Created on {{ created_at|date:"F j, Y" }}</p>
+      </div>
+
+      <hr />
+
+      <p class="mt-3" id="desc">
+        {% if description|length > 300 %}
+        <span id="short-text"> {{ description|slice:":300" }}... </span>
+        <span id="full-text" style="display: none"> {{ description }} </span>
+        <button
+          id="readMoreBtn"
+          class="btn btn-link p-0 d-block"
+          onclick="toggleReadMore()"
+        >
+          Read More
+        </button>
+        {% else %}
+        {{ description }}
+        {% endif %}
+      </p>
+      <div class="d-flex align-items-center gap-2 project-actions">
+        {% if project.status == 'active' %}
+        <a
+          href="{% url 'donation' project.id %}"
+          class="btn btn-success w-100 my-3"
+          >Donate now</a
+        >
+        {% else %}
+        <button class="btn btn-secondary w-100 my-3" disabled>
+          Donations Closed
+        </button>
+        {% endif %}
+        <button
+          class="btn btn-light w-100 my-3"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#shareModal"
+        >
+          Share
+        </button>
+      </div>
+
+      <hr />
+
+      <div class="d-flex gap-2 mb-3 project-actions">
+        <a
+          href="{% url 'report_project' project.id %}"
+          class="btn btn-light d-flex align-items-center border rounded-pill px-3 py-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-flag"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M14.778 3.22a.5.5 0 0 1 .222.415v7.304a.5.5 0 0 1-.777.416L10.447 9l-4.553 2.355V14.5a.5.5 0 0 1-1 0V2.5a.5.5 0 0 1 .777-.416L10.553 5l4.003-2.146a.5.5 0 0 1 .222-.055z"
+            />
+          </svg>
+          <span class="ms-2">Report Project</span>
+        </a>
+
+        {% if user == project.creator and can_be_cancelled %}
+        <a
+          href="{% url 'cancel_project' project.id %}"
+          class="btn btn-danger d-flex align-items-center rounded-pill px-3 py-2"
+        >
+          <i class="bi bi-x-circle me-2"></i>
+          <span>Cancel Project</span>
+        </a>
+        {% endif %}
+      </div>
+
+      <hr />
+
+      <section>
+        <div class="container py-3 text-body">
+          <div class="row d-flex justify-content-center">
+            <div class="col">
+              <div class="card mb-4 card-consistent">
+                <div class="card-body">
+                  <h5 class="mb-3">Add a Comment</h5>
+
+                  {% if user.is_authenticated %}
+                  <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                      <textarea
+                        class="form-control"
+                        name="comment"
+                        rows="3"
+                        placeholder="Your comment"
+                        required
+                      ></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                      Post Comment
+                    </button>
+                  </form>
+                  {% else %}
+                  <p>You must be logged in to post a comment.</p>
+                  <p>
+                    <a
+                      href="{% url 'account_login' %}"
+                      class="btn btn-outline-primary"
+                      >Log In</a
+                    >
+                  </p>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div id="comments-container">
+                {% for c in comments %}
+
+                <div
+                  class="d-flex flex-start mb-4 comment-item {% if forloop.counter0 >= 2 %}hidden-comment{% endif %}"
+                  data-index="{{ forloop.counter0 }}"
+                  {% if forloop.counter0 >= 2 %}style="display: none;"{% endif %}
+                >
+                  <img
+                    class="rounded-circle shadow-1-strong me-3 comment-avatar"
+                    src="{{ c.user.profile_picture.url }}"
+                    alt="avatar"
+                    width="65"
+                    height="65"
+                  />
+                  <div class="card w-100 card-consistent">
+                    <div class="card-body p-4">
+                      <h5>{{ c.user }}</h5>
+                      <p class="small text-muted">{{ c.timestamp }}</p>
+                      <p>{{ c.text }}</p>
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <div class="d-flex align-items-center">
+                          <a href="#!" class="link-muted me-2"
+                            ><i class="fas fa-thumbs-up me-1"></i>Like</a
+                          >
+                          <a href="#!" class="link-muted"
+                            ><i class="fas fa-thumbs-down me-1"></i>Dislike</a
+                          >
+                        </div>
+                        <a href="#!" class="link-muted"
+                          ><i class="fas fa-reply me-1"></i> Reply</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+                
+                {% if comments.count > 2 %}
+                <div class="text-center mb-4">
+                  <button id="showMoreComments" class="btn btn-outline-primary">
+                    Show More Comments
+                  </button>
+                </div>
+                {% endif %}
+              </div>
+
+              <hr />
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-md-4 mt-4">
+      <div class="card shadow-sm card-consistent">
+        <div class="card-body">
+          <h4>£{{ raised|intcomma }} raised</h4>
+          <p class="text-muted">
+            £{{ goal|intcomma }} goal · {{ comments.count }} comments
+          </p>
+
+          <div class="progress progress-custom" style="height: 20px">
+            <div
+              class="progress-bar bg-success"
+              role="progressbar"
+              style="width: {{ percent|floatformat:0 }}%"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="{{ percent|floatformat:0 }}"
+            >
+              {{ percent|floatformat:0 }}%
+            </div>
+          </div>
+
+          <div class="project-actions">
+            {% if project.status == 'active' %}
+            <a
+              href="{% url 'donation' project.id %}"
+              class="btn btn-success w-100 my-3"
+              >Donate now</a
+            >
+            {% else %}
+            <button class="btn btn-secondary w-100 my-3" disabled>
+              Donations Closed
+            </button>
+            {% endif %}
+            <button
+              class="btn btn-light w-100 mb-3"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#shareModal"
+            >
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {% if user.is_authenticated and user == project.creator and project.status != 'cancelled' %}
+      <div class="card border-0 shadow-sm card-consistent mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Project Management</h5>
+        </div>
+        <div class="card-body">
+          <a
+            href="{% url 'edit_project' project.id %}"
+            class="btn btn-primary w-100 mb-2"
+          >
+            <i class="bi bi-pencil-square me-2"></i>Edit Project
+          </a>
+          <p class="text-muted small mb-0 mt-2">
+            As the creator of this project, you can edit its details or add more
+            images.
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card border-0 shadow-sm card-consistent mb-4 mt-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Rate this Project</h5>
+        </div>
+        <div class="card-body">
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'rate_project' project.id %}">
+            {% csrf_token %}
+            <div class="mb-3 text-center">
+              <div class="rating-stars fs-3 mb-2">
+                {% for i in "12345" %}
+                <input
+                  type="radio"
+                  id="star{{ i }}"
+                  name="rating"
+                  value="{{ i }}"
+                  class="d-none"
+                />
+                <label
+                  for="star{{ i }}"
+                  class="text-warning mb-0"
+                  style="cursor: pointer"
+                >
+                  <i
+                    class="bi bi-star{% if forloop.counter <= rating|floatformat:0 %}-fill{% endif %}"
+                  ></i>
+                </label>
+                {% endfor %}
+              </div>
+              <small class="text-muted d-block">Click a star to rate</small>
+            </div>
+            <button type="submit" class="btn btn-outline-success w-100">
+              Submit Rating
+            </button>
+          </form>
+          {% else %}
+          <p class="text-center">You must be logged in to rate this project.</p>
+          <a
+            href="{% url 'account_login' %}"
+            class="btn btn-outline-primary w-100"
+            >Log In</a
+          >
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm card-consistent mb-4 mt-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Project Stats</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Category</span>
+              <span class="badge bg-success rounded-pill">{{ project.category.name }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Created</span>
+              <span>{{ created_at|date:"M d, Y" }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Deadline</span>
+              <span>{{ end_time|date:"M d, Y" }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Status</span>
+              <span class="badge {% if project.status == 'cancelled' %}bg-danger{% else %}bg-success{% endif %} rounded-pill">{{ project.status|title }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Tags</span>
+              <span class="badge bg-success rounded-pill"
+                >{{ project.tags.all|join:", " }}</span
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="shareModal"
+  tabindex="-1"
+  aria-labelledby="shareModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shareModalLabel">Share this project</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-center gap-3">
+          <a
+            href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-primary"
+          >
+            <i class="bi bi-facebook"></i>
+          </a>
+          <a
+            href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ project.title|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-info"
+          >
+            <i class="bi bi-twitter"></i>
+          </a>
+          <a
+            href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-secondary"
+          >
+            <i class="bi bi-linkedin"></i>
+          </a>
+          <a
+            href="mailto:?subject={{ 'Check out this project: '|add:project.title|urlencode }}&body={{ 'I thought you might be interested in this project: '|add:request.build_absolute_uri|urlencode }}"
+            class="btn btn-outline-danger"
+          >
+            <i class="bi bi-envelope"></i>
+          </a>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="projectUrl"
+              value="{{ request.build_absolute_uri }}"
+              readonly
+            />
+            <button
+              class="btn btn-outline-success"
+              type="button"
+              id="copyButton"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleReadMore() {
+    const shortText = document.getElementById("short-text");
+    const fullText = document.getElementById("full-text");
+    const btn = document.getElementById("readMoreBtn");
+
+    if (fullText.style.display === "none") {
+      fullText.style.display = "inline";
+      shortText.style.display = "none";
+      btn.textContent = "Read Less";
+    } else {
+      fullText.style.display = "none";
+      shortText.style.display = "inline";
+      btn.textContent = "Read More";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const copyButton = document.getElementById("copyButton");
+    const projectUrl = document.getElementById("projectUrl");
+    const showMoreCommentsBtn = document.getElementById("showMoreComments");
+    const hiddenComments = document.querySelectorAll('.hidden-comment');
+
+    if (showMoreCommentsBtn) {
+      showMoreCommentsBtn.addEventListener('click', function() {
+        hiddenComments.forEach(comment => {
+          comment.style.display = 'flex';
+        });
+        this.style.display = 'none';
+      });
+    }
+
+    copyButton.addEventListener("click", function () {
+      if (navigator.clipboard) {
+        navigator.clipboard
+          .writeText(projectUrl.value)
+          .then(() => {
+            const originalText = copyButton.innerHTML;
+            copyButton.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            setTimeout(function () {
+              copyButton.innerHTML = originalText;
+            }, 2000);
+          })
+          .catch((err) => {
+            console.error("Could not copy text: ", err);
+            projectUrl.select();
+            document.execCommand("copy");
+          });
+      } else {
+        projectUrl.select();
+        document.execCommand("copy");
+
+        const originalText = copyButton.innerHTML;
+        copyButton.innerHTML = '<i class="bi bi-check"></i> Copied!';
+        setTimeout(function () {
+          copyButton.innerHTML = originalText;
+        }, 2000);
+      }
+    });
+
+    const ratingLabels = document.querySelectorAll('.rating-stars label');
+    ratingLabels.forEach((label, index) => {
+      label.addEventListener('mouseover', () => {
+        // Highlight stars on hover
+        for (let i = 0; i <= index; i++) {
+          ratingLabels[i].querySelector('i').classList.remove('bi-star');
+          ratingLabels[i].querySelector('i').classList.add('bi-star-fill');
+        }
+        for (let i = index + 1; i < ratingLabels.length; i++) {
+          ratingLabels[i].querySelector('i').classList.remove('bi-star-fill');
+          ratingLabels[i].querySelector('i').classList.add('bi-star');
+        }
+      });
+
+      label.addEventListener('mouseleave', () => {
+        // Reset to current rating when mouse leaves
+        const currentRating = document.querySelector('input[name="rating"]:checked');
+        const currentValue = currentRating ? parseInt(currentRating.value) : 0;
+        
+        for (let i = 0; i < ratingLabels.length; i++) {
+          if (i < currentValue) {
+            ratingLabels[i].querySelector('i').classList.remove('bi-star');
+            ratingLabels[i].querySelector('i').classList.add('bi-star-fill');
+          } else {
+            ratingLabels[i].querySelector('i').classList.remove('bi-star-fill');
+            ratingLabels[i].querySelector('i').classList.add('bi-star');
+          }
+        }
+      });
+
+      label.addEventListener('click', () => {
+        const radioBtn = document.getElementById('star' + (index + 1));
+        radioBtn.checked = true;
+        
+        // Update visual state
+        for (let i = 0; i <= index; i++) {
+          ratingLabels[i].querySelector('i').classList.remove('bi-star');
+          ratingLabels[i].querySelector('i').classList.add('bi-star-fill');
+        }
+        for (let i = index + 1; i < ratingLabels.length; i++) {
+          ratingLabels[i].querySelector('i').classList.remove('bi-star-fill');
+          ratingLabels[i].querySelector('i').classList.add('bi-star');
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
