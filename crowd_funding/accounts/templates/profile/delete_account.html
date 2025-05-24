@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Delete Account - Sharikna{% endblock %}
+{% block content %}
+<div class="container py-5" style="margin-top: 80px">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card border-0 shadow">
+        <div class="card-header bg-white py-3 border-0">
+          <h4 class="text-danger mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Account
+          </h4>
+        </div>
+        <div class="card-body p-4">
+          <div class="alert alert-danger">
+            <h5 class="alert-heading">
+              Warning: This action cannot be undone!
+            </h5>
+            <p>
+              You are about to permanently delete your account and all
+              associated data. This includes:
+            </p>
+            <ul>
+              <li>Your personal information</li>
+              <li>All your projects</li>
+              <li>All your donations</li>
+              <li>All your comments and activity</li>
+            </ul>
+            <p class="mb-0">
+              Once deleted, this information cannot be recovered.
+            </p>
+          </div>
+
+          <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="{{ form.password.id_for_label }}" class="form-label">
+                {{ form.password.label }}
+              </label>
+              {{ form.password }}
+              <div class="form-text">{{ form.password.help_text }}</div>
+              {% if form.password.errors %}
+              <div class="text-danger">{{ form.password.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>Delete My Account
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
