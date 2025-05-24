@@ -1,51 +1,154 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        body {
-            background: linear-gradient(rgba(34, 49, 63, 0.7), rgba(34, 49, 63, 0.7)), url('{% static "images/gofundme-bg.jpg" %}') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
+{% block title %}Register - Sharikna{% endblock %}
 
-        .register-box {
-            width: 100%;
-            max-width: 700px;
-            background: rgba(255,255,255,0.95);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-            margin-top:30px;
-            margin-bottom:30px;
-        }
+{% block content %}
+<div class="container-fluid py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h3 class="text-success fw-bold mb-2">Create Your Account</h3>
+                        <p class="text-muted">Join our community and start making a difference</p>
+                    </div>
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>There were errors in your form:</strong>
+                        {{ form.non_field_errors }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="text-danger">{{ form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.mobile_phone.id_for_label }}" class="form-label">Mobile Phone</label>
+                                {{ form.mobile_phone }}
+                                <small class="text-muted">Format: 01XXXXXXXXX (Egyptian number)</small>
+                                {% if form.mobile_phone.errors %}
+                                    <div class="text-danger">{{ form.mobile_phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Profile Picture</label>
+                                {{ form.profile_picture }}
+                                {% if form.profile_picture.errors %}
+                                    <div class="text-danger">{{ form.profile_picture.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                                <div class="input-group">
+                                    {{ form.password }}
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">{{ form.password.help_text }}</small>
+                                {% if form.password.errors %}
+                                    <div class="text-danger">{{ form.password.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    {{ form.confirm_password }}
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                {% if form.confirm_password.errors %}
+                                    <div class="text-danger">{{ form.confirm_password.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">Create Account</button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p>Already have an account? <a href="{% url 'login' %}" class="text-decoration-none text-success">Sign in</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        .register-box h3 {
-            font-weight: bold;
-            color: #198754;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('{{ form.password.id_for_label }}');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // Toggle eye icon
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+        
+        // Toggle confirm password visibility
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPassword = document.getElementById('{{ form.confirm_password.id_for_label }}');
+        
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+            
+            // Toggle eye icon
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+    });
+</script>
 
-        .register-box p {
-            color: #555;
-            margin-bottom: 30px;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #222;
-        }
-
+<style>
         .form-control {
             border-radius: 10px;
             border: 1px solid #ced4da;
@@ -108,107 +211,5 @@
             color: #888;
             font-size: 0.95rem;
         }
-
-        .social-btns {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .btn-google {
-            background: #fff;
-            border: 1px solid #ddd;
-            color: #ea4335;
-            flex: 1;
-            font-weight: 500;
-            border-radius: 10px;
-            min-height: 50px;
-        }
-
-        .btn-facebook {
-            background: #1877f2;
-            color: #fff;
-            border: none;
-            flex: 1;
-            font-weight: 500;
-            border-radius: 10px;
-            min-height: 50px;
-        }
-
-        .login-link {
-            color: #198754;
-            text-decoration: underline;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .login-link:hover {
-            color: #145db2;
-        }
-    </style>
-</head>
-<body>
-    <div class="register-box text-center ">
-        <h3><i class="fa-solid fa-leaf me-2"></i>Create Your Account</h3>
-        <p>Join <span class="fw-bold text-success">Fund Me</span> and start your journey.</p>
-
-        <div class="social-btns mb-3 ">
-            <a href="#" class="btn btn-google flex align-content-center"><i class="fab fa-google me-2 "></i>Google</a>
-            <a href="#" class="btn btn-facebook flex align-content-center"><i class="fab fa-facebook-f me-2"></i>Facebook</a>
-        </div>
-
-        <div class="divider"><span>or register with email</span></div>
-
-        <form method="post" enctype="multipart/form-data" class="text-start">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    {{ form.first_name.label_tag }}
-                    {{ form.first_name }}
-                    {% if form.first_name.errors %}
-                        <div class="text-danger small">{{ form.first_name.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="col-md-6 mb-3">
-                    {{ form.last_name.label_tag }}
-                    {{ form.last_name }}
-                    {% if form.last_name.errors %}
-                        <div class="text-danger small">{{ form.last_name.errors }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% for field in form %}
-                {% if field.name != "first_name" and field.name != "last_name" %}
-                    <div class="mb-3">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="text-danger small">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                {% endif %}
-            {% endfor %}
-            {% if form.password.errors %}
-                <div class="text-danger small">{{ form.password.errors }}</div>
-            {% endif %}
-
-            <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-success btn-register">Register</button>
-            </div>
-        </form>
-
-        {% for message in messages %}
-            <div class="alert alert-warning mt-3">{{ message }}</div>
-        {% endfor %}
-
-        <div class="mt-4">
-            <p>Already have an account?
-                <a href="{% url 'login' %}" class="login-link">
-                    Login here
-                </a>
-            </p>
-        </div>
-    </div>
-</body>
-</html>
+</style>
+{% endblock %}
