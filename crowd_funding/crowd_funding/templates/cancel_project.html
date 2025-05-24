@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Cancel Project - Sharikna{%endblock%}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="mb-4 text-center">Cancel Project</h2>
+
+          <div class="alert alert-warning">
+            <h5 class="alert-heading">Warning!</h5>
+            <p>
+              You are about to cancel your project "{{ project.title }}". This
+              action cannot be undone.
+            </p>
+            <hr />
+            <p class="mb-0">If you cancel this project:</p>
+            <ul>
+              <li>
+                The project will no longer be visible in the main project
+                listings
+              </li>
+              <li>Existing donations will be returned to donors</li>
+              <li>You will not be able to reactivate this project later</li>
+            </ul>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h5>Project Details</h5>
+              <p><strong>Title:</strong> {{ project.title }}</p>
+              <p><strong>Category:</strong> {{ project.category.name }}</p>
+              <p><strong>Target:</strong> ${{ project.total_target }}</p>
+            </div>
+            <div class="col-md-6">
+              <h5>Funding Status</h5>
+              {% if donations %}
+              <p><strong>Total Donations:</strong> {{ donations|length }}</p>
+              <p><strong>Amount Raised:</strong> ${{ total_amount }}</p>
+              <p>
+                <strong>Percentage of Target:</strong> {{ percentage|floatformat:0 }}%
+              </p>
+              {% else %}
+              <p><strong>Total Donations:</strong> 0</p>
+              <p><strong>Amount Raised:</strong> $0</p>
+              <p><strong>Percentage of Target:</strong> 0%</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <form method="POST">
+            {% csrf_token %}
+            <div class="d-flex justify-content-between">
+              <a
+                href="{% url 'projects' project.id %}"
+                class="btn btn-secondary"
+                >Go Back</a
+              >
+              <button type="submit" class="btn btn-danger">
+                Cancel Project
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
