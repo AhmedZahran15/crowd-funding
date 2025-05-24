@@ -1,70 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Activate Your Account</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f5f5f5;
-            padding: 30px;
-        }
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Activate Your Account{% endblock %}
+{% block content %}
+<div class="container-fluid py-5" style="margin-top: 80px">
+  <div
+    class="container"
+    style="
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 40px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    "
+    }
+  >
+    <h2>Hello,</h2>
+    <p>
+      Thank you for registering at <strong>Fund Me</strong>, your trusted
+      crowdfunding platform in Egypt!
+    </p>
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-        }
+    <p>Please Check Your Email to activate your account:</p>
+    <p>This link will expire in 24 hours.</p>
 
-        h2 {
-            color: #198754;
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: #444;
-            font-size: 1.05rem;
-            line-height: 1.6;
-        }
-
-        .btn {
-            display: inline-block;
-            background: linear-gradient(90deg, #198754, #43e97b);
-            color: white;
-            text-decoration: none;
-            padding: 12px 25px;
-            font-weight: 600;
-            border-radius: 8px;
-            margin-top: 20px;
-            transition: background 0.3s ease-in-out;
-        }
-
-        .btn:hover {
-            background: linear-gradient(90deg, #43e97b, #198754);
-        }
-
-        .footer {
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: #777;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Hello,</h2>
-        <p>Thank you for registering at <strong>Fund Me</strong>, your trusted crowdfunding platform in Egypt!</p>
-
-        <p>Please Check Your Email to activate your account:</p>
-        <p>This link will expire in 24 hours.</p>
-
-        <div class="footer">
-            &copy; {{ year }} Fund Me. All rights reserved.
-        </div>
-    </div>
-</body>
-</html>
+    <div class="footer">&copy; {{ year }} Fund Me. All rights reserved.</div>
+  </div>
+</div>
+{% endblock %}

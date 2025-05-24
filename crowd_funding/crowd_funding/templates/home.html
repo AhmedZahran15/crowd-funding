@@ -1,413 +1,555 @@
-{% extends "base.html" %}
-
+{% extends "base.html" %} 
+{% load static %} 
+{% block title %}Home - Sharikna {%endblock %}
 {% block content %}
+<style>
+  .project-image {
+    height: 250px;
+    width: 80%;
+    object-fit: cover;
+    margin: 1rem auto;
+    display: block;
+  }
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  .icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
 
-<section class ="heroImg herosection bg-cover"  id="hero-id">
-    <div class="overlay"> </div>
-    <div class="container text-white text-center">
-        <div class="row">
-            <div class='col-12'>
-                <h1 class ="display-5" >Together, We Can Bring Hope to People <br> 
-                    Facing Poverty, Illness, and Hardship</h1>
-                <p class="my-4 my-4 fs-5">Every donation makes a real difference providing food, medical care,and shelter to 
-                    <br>those who need it most6. Join us in rebuilding lives and restoring dignity.</p>
-                <a href="#" class="btn btn-main">Get Started</a>
-            </div>
-        <div>
-    <div>
+  .divider {
+    width: 60px;
+    height: 3px;
+    background-color: #198754;
+    margin: 20px auto;
+  }
 
- </section>
- 
- <section id ="top-projects" class="text-center">
-   
-    <div class="container">
-       
-        <div class="row">
-             
-            <div class="col-12  section-intro text-center">
-                <h1>Trending Donation</h1>
-                <div class="divider"> </div>
-                <p class="text-dark">
-                Discover our top 5 highest-rated running projects, trusted by our community. 
-                <br>Each one is making a real impact your support can help bring them closer to their goals  
-                </p>
-            </div>
-        </div>
-        <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
-  <div class="carousel-inner">
-    {% for i in "12345" %}
-      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-        <div class="container">
-          <div class="row gx-3 flex-nowrap justify-content-center">
-        
-            <div class="col-lg-4 col-md-6 col-sm-12">
-              <div class="card h-100 shadow-sm card-edit">
-                <img src="static/images/img{{ forloop.counter }}.jpg"  alt="Project Image" style="height:250px ; width:80%; object-fit: cover; margin: 1rem auto; display: block;">
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title text-success">Project {{ forloop.counter }}</h5>
-                  <p class="card-text flex-grow-1">
-                    This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                  </p>
-                  <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
+  .section-intro {
+    margin-bottom: 40px;
+  }
+
+  .category-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+  }
+
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .carousel-container {
+    position: relative;
+  }
+
+  .custom-carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background-color: #198754;
+    border: none;
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+
+  .custom-carousel-control:hover {
+    opacity: 1;
+    background-color: #146c43;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .custom-carousel-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+  }
+
+  .carousel-control-prev.custom-carousel-control {
+    left: -25px;
+  }
+
+  .carousel-control-next.custom-carousel-control {
+    right: -25px;
+  }
+
+  .custom-carousel-control .carousel-control-prev-icon,
+  .custom-carousel-control .carousel-control-next-icon {
+    background-size: 20px 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .custom-carousel-control {
+      width: 40px;
+      height: 40px;
+    }
+
+    .carousel-control-prev.custom-carousel-control {
+      left: -20px;
+    }
+
+    .carousel-control-next.custom-carousel-control {
+      right: -20px;
+    }
+
+    .custom-carousel-control .carousel-control-prev-icon,
+    .custom-carousel-control .carousel-control-next-icon {
+      background-size: 16px 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Stack items vertically on mobile */
+    .carousel-item .col-lg-4 {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .custom-carousel-control {
+      width: 35px;
+      height: 35px;
+    }
+
+    .carousel-control-prev.custom-carousel-control {
+      left: -15px;
+    }
+
+    .carousel-control-next.custom-carousel-control {
+      right: -15px;
+    }
+  }
+
+  /* Ensure carousel items have proper spacing */
+  .carousel-inner {
+    padding: 0 30px;
+  }
+
+  @media (max-width: 768px) {
+    .carousel-inner {
+      padding: 0 15px;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
+<section class="heroImg herosection bg-cover" id="hero-id">
+  <div class="overlay"></div>
+  <div class="container text-white text-center">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="display-5">
+          Together, We Can Bring Hope to People <br />
+          Facing Poverty, Illness, and Hardship
+        </h1>
+        <p class="my-4 fs-5">
+          Every donation makes a real difference providing food, medical care,
+          and shelter to <br />those who need it most. Join us in rebuilding
+          lives and restoring dignity.
+        </p>
+        <a href="{% url 'project_list' %}" class="btn btn-success"
+          >Find Projects</a
+        >
+        {% if user.is_authenticated %}
+        <a href="{% url 'create_project' %}" class="btn btn-outline-light ms-2"
+          >Start a Project</a
+        >
+        {% else %}
+        <a href="{% url 'register' %}" class="btn btn-outline-light ms-2"
+          >Join Now</a
+        >
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Top Rated Projects Slider -->
+<section id="top-rated-projects" class="text-center py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 section-intro text-center">
+        <h1>Highest Rated Projects</h1>
+        <div class="divider"></div>
+        <p class="text-dark">
+          These projects have received exceptional ratings from our community.
+          <br />Your support can help them achieve even more.
+        </p>
+      </div>
+    </div>
+
+    {% if highest_rated_projects %}
+    <div class="carousel-container position-relative">
+      <div
+        id="highestRatedCarousel"
+        class="carousel slide"
+        data-bs-ride="carousel"
+      >
+        <div class="carousel-inner">
+          {% for project in highest_rated_projects %}
+          {% if forloop.counter0|divisibleby:3 %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="row">
+          {% endif %}
+              <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                  {% if project.images.first %}
+                  <img
+                    src="{{ project.images.first.image.url }}"
+                    alt="{{ project.title }}"
+                    class="project-image"
+                  />
+                  {% endif %}
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-success">{{ project.title }}</h5>
+                    <p class="card-text flex-grow-1">
+                      {{ project.details|truncatechars:150 }}
+                    </p>
+                    <div class="progress mb-3" style="height: 10px">
+                      <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        style="width: {{ project.progress_percentage }}%;"
+                        aria-valuenow="{{ project.progress_percentage }}"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                      <span>${{ project.total_donations }} raised</span>
+                      <span>{{ project.days_left }} days left</span>
+                    </div>
+                    <a
+                      href="{% url 'project_detail' project.id %}"
+                      class="btn btn-success btn-sm d-block"
+                    >
+                      View Project
+                    </a>
+                  </div>
                 </div>
               </div>
+          {% if forloop.counter|divisibleby:3 or forloop.last %}
             </div>
-            
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        <button
+          class="carousel-control-prev custom-carousel-control"
+          type="button"
+          data-bs-target="#highestRatedCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next custom-carousel-control"
+          type="button"
+          data-bs-target="#highestRatedCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+    {% else %}
+    <div class="row">
+      <div class="col-12">
+        <p class="text-muted">
+          No highest rated projects available at the moment.
+        </p>
+      </div>
+    </div>
+    {% endif %}
 
-            <div class="col-lg-4 col-md-6 d-sm-none d-md-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 5 %}
-                  <img src="static/images/img1.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
+    <div class="mt-4">
+      <a href="{% url 'project_list' %}" class="btn btn-outline-success btn-lg">
+        View All Projects
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works section -->
+<section id="how-it-works" class="py-5 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 section-intro text-center mb-5">
+        <h1>How It Works</h1>
+        <div class="divider"></div>
+        <p class="text-dark">
+          Making a difference is simple with our easy-to-use platform.
+        </p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 text-center">
+        <div class="steps p-4 bg-white rounded shadow-sm">
+          <div class="icon-box bg-success text-white mx-auto mb-4">
+            <i class="bi bi-search"></i>
+          </div>
+          <h4>1. Find a Project</h4>
+          <p>Browse through meaningful projects aligned with your values.</p>
+        </div>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="steps p-4 bg-white rounded shadow-sm">
+          <div class="icon-box bg-success text-white mx-auto mb-4">
+            <i class="bi bi-heart-fill"></i>
+          </div>
+          <h4>2. Make a Donation</h4>
+          <p>Contribute any amount to help projects reach their goals.</p>
+        </div>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="steps p-4 bg-white rounded shadow-sm">
+          <div class="icon-box bg-success text-white mx-auto mb-4">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <h4>3. Track Progress</h4>
+          <p>See the real impact of your contribution over time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Projects Section -->
+<section id="featured-projects" class="text-center py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 section-intro text-center">
+        <h1>Featured Projects</h1>
+        <div class="divider"></div>
+        <p class="text-dark">
+          Discover our top featured projects trusted by our community.
+        </p>
+      </div>
+    </div>
+
+    {% if featured_projects %}
+    <div class="carousel-container position-relative">
+      <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% for project in featured_projects %}
+          {% if forloop.counter0|divisibleby:3 %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="row">
+          {% endif %}
+              <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                  {% if project.images.first %}
+                  <img
+                    src="{{ project.images.first.image.url }}"
+                    alt="{{ project.title }}"
+                    class="project-image"
+                  />
+                  {% endif %}
                   <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:1 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:1 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
+                    <h5 class="card-title text-success">{{ project.title }}</h5>
+                    <p class="card-text flex-grow-1">
+                      {{ project.details|truncatechars:150 }}
+                    </p>
+                    <div class="progress mb-3" style="height: 10px">
+                      <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        style="width: {{ project.progress_percentage }}%;"
+                      ></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                      <span>${{ project.total_donations }} raised</span>
+                      <span>{{ project.days_left }} days left</span>
+                    </div>
+                    <a
+                      href="{% url 'project_detail' project.id %}"
+                      class="btn btn-success btn-sm d-block"
+                    >
+                      View Project
+                    </a>
+                  </div>
+                </div>
               </div>
-              </div>
+          {% if forloop.counter|divisibleby:3 or forloop.last %}
             </div>
-            
-   
-            <div class="col-lg-4 d-none d-lg-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 4 %}
-                  <img src="static/images/img1.jpg" alt="Project Image" style=" width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        <button
+          class="carousel-control-prev custom-carousel-control"
+          type="button"
+          data-bs-target="#featuredCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next custom-carousel-control"
+          type="button"
+          data-bs-target="#featuredCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+    {% else %}
+    <div class="row">
+      <div class="col-12">
+        <p class="text-muted">No featured projects available at the moment.</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Latest Projects Section -->
+<section id="latest-projects" class="text-center py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 section-intro text-center">
+        <h1>Latest Projects</h1>
+        <div class="divider"></div>
+        <p class="text-dark">
+          Explore recent ideas and initiatives from our community
+        </p>
+      </div>
+    </div>
+
+    {% if latest_projects %}
+    <div class="carousel-container position-relative">
+      <div id="latestCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% for project in latest_projects %}
+          {% if forloop.counter0|divisibleby:3 %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="row">
+          {% endif %}
+              <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                  {% if project.images.first %}
+                  <img
+                    src="{{ project.images.first.image.url }}"
+                    alt="{{ project.title }}"
+                    class="project-image"
+                  />
+                  {% endif %}
                   <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% elif forloop.counter == 5 %}
-                  <img src="static/images/img2.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 2</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:2 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:2 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
+                    <h5 class="card-title text-success">{{ project.title }}</h5>
+                    <p class="card-text flex-grow-1">
+                      {{ project.details|truncatechars:100 }}
+                    </p>
+                    <a
+                      href="{% url 'project_detail' project.id %}"
+                      class="btn btn-success mx-auto py-2 px-1 w-75"
+                    >
+                      View Project
+                    </a>
+                  </div>
+                </div>
               </div>
-              </div>
+          {% if forloop.counter|divisibleby:3 or forloop.last %}
             </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        <button
+          class="carousel-control-prev custom-carousel-control"
+          type="button"
+          data-bs-target="#latestCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next custom-carousel-control"
+          type="button"
+          data-bs-target="#latestCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+    {% else %}
+    <div class="row">
+      <div class="col-12">
+        <p class="text-muted">No recent projects available at the moment.</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Categories Section -->
+<section id="categories-section" class="text-center py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 section-intro text-center">
+        <h1>Project Categories</h1>
+        <div class="divider"></div>
+        <p class="text-dark">Browse projects by category</p>
+      </div>
+    </div>
+
+    {% if categories %}
+    <div class="row">
+      {% for category in categories %}
+      <div class="col-md-4 mb-4">
+        <div class="category-card card h-100 shadow-sm">
+          <div class="card-body text-center">
+            <h3 class="card-title text-success">{{ category.name }}</h3>
+            <p class="card-text">Discover {{ category.name }} projects</p>
+            <a
+              href="{% url 'project_list' %}?category={{ category.id }}"
+              class="btn btn-success"
+            >
+              Browse Category
+            </a>
           </div>
         </div>
       </div>
-    {% endfor %}
-  </div>
-
-  <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-
- </section>
-{% comment %} List of the Latest Projects {% endcomment %}
-<section id ="latest_projects" class="text-center">
-   
-    <div class="container">
-       
-        <div class="row">
-             
-            <div class="col-12  section-intro text-center">
-                <h1>List of the Latest Projects</h1>
-                <div class="divider"> </div>
-                <p class="text-dark">
-                 Explore the most recent ideas and initiatives added by our community
-                </p>
-            </div>
-        </div>
-        <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true" >
-  <div class="carousel-inner">
-    {% for i in "12345" %}
-      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-        <div class="container">
-          <div class="row gx-3 flex-nowrap justify-content-center">
-        
-            <div class="col-lg-4 col-md-6 col-sm-12">
-              <div class="card h-100 shadow-sm card-edit">
-                <img src="static/images/img{{ forloop.counter }}.jpg"  alt="Project Image" style="height:250px ; width:80%; object-fit: cover; margin: 1rem auto; display: block;">
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title text-success">Project {{ forloop.counter }}</h5>
-                  <p class="card-text flex-grow-1">
-                    This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                  </p>
-                  <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-                </div>
-              </div>
-            </div>
-            
-
-            <div class="col-lg-4 col-md-6 d-sm-none d-md-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 5 %}
-                  <img src="static/images/img1.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:1 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:1 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-              </div>
-              </div>
-            </div>
-            
-   
-            <div class="col-lg-4 d-none d-lg-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 4 %}
-                  <img src="static/images/img1.jpg" alt="Project Image" style=" width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% elif forloop.counter == 5 %}
-                  <img src="static/images/img2.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 2</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:2 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:2 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-              </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+      <div class="col-12">
+        <p class="text-muted">No categories available at the moment.</p>
       </div>
-    {% endfor %}
+    </div>
+    {% endif %}
   </div>
-
-  <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-
- </section>
-
- {% comment %}List of  Tag Selected Projects with Tags  {% endcomment %}
-
- <section id ="tags_projects" class="text-center">
-   
-    <div class="container">
-       
-        <div class="row">
-             
-            <div class="col-12  section-intro text-center">
-                <h1>Featured Projects</h1>
-                <div class="divider"> </div>
-                <p class="text-dark">
-                Handpicked projects making the biggest impact 
-                <br>filter by tags to find what matters to you.
-                </p>
-            </div>
-        </div>
-        <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
-  <div class="carousel-inner">
-    {% for i in "12345" %}
-      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-        <div class="container">
-          <div class="row gx-3 flex-nowrap justify-content-center">
-        
-            <div class="col-lg-4 col-md-6 col-sm-12">
-              <div class="card h-100 shadow-sm card-edit">
-                <img src="static/images/img{{ forloop.counter }}.jpg"  alt="Project Image" style="height:250px ; width:80%; object-fit: cover; margin: 1rem auto; display: block;">
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title text-success">Project {{ forloop.counter }}</h5>
-                  <p class="card-text flex-grow-1">
-                    This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                  </p>
-                  <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-                </div>
-              </div>
-            </div>
-            
-
-            <div class="col-lg-4 col-md-6 d-sm-none d-md-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 5 %}
-                  <img src="static/images/img1.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:1 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:1 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-              </div>
-              </div>
-            </div>
-            
-   
-            <div class="col-lg-4 d-none d-lg-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 4 %}
-                  <img src="static/images/img1.jpg" alt="Project Image" style=" width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% elif forloop.counter == 5 %}
-                  <img src="static/images/img2.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 2</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:2 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:2 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-              </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-
-  <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-
- </section>
-
-{% comment %} categories_projects {% endcomment %}
- <section id ="categories_projects" class="text-center">
-   
-    <div class="container">
-       
-        <div class="row">
-             
-            <div class="col-12  section-intro text-center">
-                <h1>Project Categories</h1>
-                <div class="divider"> </div>
-                <p class="text-dark">
-               Browse by category to discover projects aligned with your interests or field.
-            
-                </p>
-            </div>
-        </div>
-        <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true">
-  <div class="carousel-inner">
-    {% for i in "12345" %}
-      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-        <div class="container">
-          <div class="row gx-3 flex-nowrap justify-content-center">
-        
-            <div class="col-lg-4 col-md-6 col-sm-12">
-              <div class="card h-100 shadow-sm card-edit">
-                <img src="static/images/img{{ forloop.counter }}.jpg"  alt="Project Image" style="height:250px ; width:80%; object-fit: cover; margin: 1rem auto; display: block;">
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title text-success">Project {{ forloop.counter }}</h5>
-                  <p class="card-text flex-grow-1">
-                    This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                  </p>
-                  <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-                </div>
-              </div>
-            </div>
-            
-
-            <div class="col-lg-4 col-md-6 d-sm-none d-md-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 5 %}
-                  <img src="static/images/img1.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:1 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:1 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-              </div>
-              </div>
-            </div>
-            
-   
-            <div class="col-lg-4 d-none d-lg-block">
-              <div class="card h-100 shadow-sm card-edit">
-                {% if forloop.counter == 4 %}
-                  <img src="static/images/img1.jpg" alt="Project Image" style=" width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 1</h5>
-                {% elif forloop.counter == 5 %}
-                  <img src="static/images/img2.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project 2</h5>
-                {% else %}
-                  <img src="static/images/img{{ forloop.counter|add:2 }}.jpg"  alt="Project Image" style="width:80%;height:250px ; object-fit: cover; margin: 1rem auto; display: block;">
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-success">Project {{ forloop.counter|add:2 }}</h5>
-                {% endif %}
-                <p class="card-text flex-grow-1">
-                  This image reflects the daily struggles faced by many. Behind every face is a story of hardship and a chance for hope.
-                </p>
-                <a href="#" class="btn btn-main mx-auto py-2 px-1 w-75">View</a>
-              </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-
-  <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-
- </section>
-
-
-
- 
-
+</section>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize all carousels
+    var carousels = document.querySelectorAll(".carousel");
+    carousels.forEach(function (carousel) {
+      new bootstrap.Carousel(carousel, {
+        interval: 2000,
+        wrap: true,
+      });
+    });
+  });
+</script>
 {% endblock %}
