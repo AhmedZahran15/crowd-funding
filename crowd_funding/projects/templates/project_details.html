@@ -126,7 +126,7 @@
       </div>
       <div class="text-warning d-flex align-items-center fs-4 mt-2 rating-display">
         {% for i in "12345" %}
-        {% if forloop.counter <= rating|floatformat:0 %}
+        {% if forloop.counter <= rating %}
         <i class="bi bi-star-fill"></i>
         {% else %}
         <i class="bi bi-star"></i>
