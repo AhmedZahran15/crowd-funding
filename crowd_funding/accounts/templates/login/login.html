@@ -1,206 +1,226 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "base.html" %} {% load static %} {% block title %}Login - Sharikna{%
+endblock %} {% block content %}
+<div class="container-fluid py-5" style="margin-top: 80px">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <h3 class="text-success fw-bold mb-2">Welcome Back!</h3>
+            <p class="text-muted">
+              Sign in to <span class="fw-bold text-success">Fund Me</span> and
+              keep supporting causes.
+            </p>
+          </div>
 
-{% block title %}Login - Sharikna{% endblock %}
+          <div class="social-btns mb-3 d-flex gap-3">
+            <a href="#" class="btn btn-google flex align-content-center"
+              ><i class="fab fa-google me-2"></i>Google</a
+            >
+            <a href="#" class="btn btn-facebook align-content-center"
+              ><i class="fab fa-facebook-f me-2"></i>Facebook</a
+            >
+          </div>
 
-{% block content %}
-<div class="container-fluid py-5" style="margin-top: 80px;">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <h3 class="text-success fw-bold mb-2">Welcome Back!</h3>
-                        <p class="text-muted">Sign in to <span class="fw-bold text-success">Fund Me</span> and keep supporting causes.</p>
-                    </div>
-                    
-                    {% if messages %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {% for message in messages %}
-                            {{ message }}
-                        {% endfor %}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="social-btns mb-3 d-flex gap-3">
-                        <a href="#" class="btn btn-google flex align-content-center"><i class="fab fa-google me-2"></i>Google</a>
-                        <a href="#" class="btn btn-facebook align-content-center"><i class="fab fa-facebook-f me-2"></i>Facebook</a>
-                    </div>
+          <div class="divider"><span>or login with email</span></div>
 
-                    <div class="divider"><span>or login with email</span></div>
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="text-danger">{{ form.email.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
-                            <div class="input-group">
-                                {{ form.password }}
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            {% if form.password.errors %}
-                                <div class="text-danger">{{ form.password.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="rememberMe">
-                                <label class="form-check-label" for="rememberMe">Remember me</label>
-                            </div>
-                            <a href="{% url 'password_reset' %}" class="forgot-link">Forgot your password?</a>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-login">Sign In</button>
-                        </div>
-                    </form>
-                    
-                    <div class="text-center mt-4">
-                        <p>Don't have an account? <a href="{% url 'register' %}" class="register-link">Register here</a></p>
-                    </div>
-                </div>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="{{ form.email.id_for_label }}" class="form-label"
+                >Email</label
+              >
+              {{ form.email }} {% if form.email.errors %}
+              <div class="text-danger">{{ form.email.errors }}</div>
+              {% endif %}
             </div>
+
+            <div class="mb-4">
+              <label for="{{ form.password.id_for_label }}" class="form-label"
+                >Password</label
+              >
+              <div class="input-group">
+                {{ form.password }}
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="togglePassword"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              {% if form.password.errors %}
+              <div class="text-danger">{{ form.password.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="rememberMe"
+                />
+                <label class="form-check-label" for="rememberMe"
+                  >Remember me</label
+                >
+              </div>
+              <a href="{% url 'password_reset' %}" class="forgot-link"
+                >Forgot your password?</a
+              >
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success btn-login">
+                Sign In
+              </button>
+            </div>
+          </form>
+
+          <div class="text-center mt-4">
+            <p>
+              Don't have an account?
+              <a href="{% url 'register' %}" class="register-link"
+                >Register here</a
+              >
+            </p>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <style>
-    .form-control {
-        border-radius: 10px;
-        border: 1px solid #ced4da;
-        min-height: 50px;
-        font-size: 1.05rem;
-        padding: 0.75rem;
-    }
+  .form-control {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    min-height: 50px;
+    font-size: 1.05rem;
+    padding: 0.75rem;
+  }
 
-    .form-control:focus {
-        border-color: #198754;
-        box-shadow: 0 0 0 0.2rem rgba(25,135,84,.15);
-    }
+  .form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+  }
 
-    .btn-login {
-        min-height: 55px;
-        font-size: 1.2rem;
-        font-weight: 600;
-        border-radius: 10px;
-        background: linear-gradient(90deg, #198754 60%, #43e97b 100%);
-        border: none;
-        transition: background 0.3s;
-    }
+  .btn-login {
+    min-height: 55px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #198754 60%, #43e97b 100%);
+    border: none;
+    transition: background 0.3s;
+  }
 
-    .btn-login:hover {
-        background: linear-gradient(90deg, #43e97b 60%, #198754 100%);
-    }
+  .btn-login:hover {
+    background: linear-gradient(90deg, #43e97b 60%, #198754 100%);
+  }
 
-    .alert {
-        border-radius: 8px;
-        font-size: 0.98rem;
-    }
+  .alert {
+    border-radius: 8px;
+    font-size: 0.98rem;
+  }
 
-    .divider {
-        text-align: center;
-        margin: 25px 0 20px 0;
-        position: relative;
-    }
+  .divider {
+    text-align: center;
+    margin: 25px 0 20px 0;
+    position: relative;
+  }
 
-    .divider::before, .divider::after {
-        content: "";
-        height: 1px;
-        width: 38%;
-        background: #ccc;
-        position: absolute;
-        top: 50%;
-    }
+  .divider::before,
+  .divider::after {
+    content: "";
+    height: 1px;
+    width: 38%;
+    background: #ccc;
+    position: absolute;
+    top: 50%;
+  }
 
-    .divider::before {
-        left: 0;
-    }
+  .divider::before {
+    left: 0;
+  }
 
-    .divider::after {
-        right: 0;
-    }
+  .divider::after {
+    right: 0;
+  }
 
-    .divider span {
-        padding: 10px 12px;
-        position: relative;
-        z-index: 1;
-        color: #888;
-        font-size: 0.95rem;
-    }
+  .divider span {
+    padding: 10px 12px;
+    position: relative;
+    z-index: 1;
+    color: #888;
+    font-size: 0.95rem;
+  }
 
-    .social-btns {
-        margin-bottom: 10px;
-    }
+  .social-btns {
+    margin-bottom: 10px;
+  }
 
-    .btn-google {
-        background: #fff;
-        border: 1px solid #ddd;
-        color: #ea4335;
-        flex: 1;
-        font-weight: 500;
-        border-radius: 10px;
-        min-height: 50px;
-    }
+  .btn-google {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #ea4335;
+    flex: 1;
+    font-weight: 500;
+    border-radius: 10px;
+    min-height: 50px;
+  }
 
-    .btn-facebook {
-        background: #1877f2;
-        color: #fff;
-        border: none;
-        flex: 1;
-        font-weight: 500;
-        border-radius: 10px;
-        min-height: 50px;
-    }
+  .btn-facebook {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    flex: 1;
+    font-weight: 500;
+    border-radius: 10px;
+    min-height: 50px;
+  }
 
-    .register-link {
-        color: #198754;
-        text-decoration: underline;
-        font-weight: 500;
-        transition: color 0.2s;
-    }
+  .register-link {
+    color: #198754;
+    text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
 
-    .register-link:hover {
-        color: #145db2;
-    }
+  .register-link:hover {
+    color: #145db2;
+  }
 
-    .forgot-link {
-        font-size: 0.9rem;
-        color: #555;
-        text-decoration: none;
-    }
+  .forgot-link {
+    font-size: 0.9rem;
+    color: #555;
+    text-decoration: none;
+  }
 
-    .forgot-link:hover {
-        color: #198754;
-        text-decoration: underline;
-    }
+  .forgot-link:hover {
+    color: #198754;
+    text-decoration: underline;
+  }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const togglePassword = document.getElementById('togglePassword');
-        const password = document.getElementById('{{ form.password.id_for_label }}');
-        
-        if (togglePassword && password) {
-            togglePassword.addEventListener('click', function() {
-                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                password.setAttribute('type', type);
-                
-                // Toggle eye icon
-                this.querySelector('i').classList.toggle('bi-eye');
-                this.querySelector('i').classList.toggle('bi-eye-slash');
-            });
-        }
-    });
+  document.addEventListener("DOMContentLoaded", function () {
+    const togglePassword = document.getElementById("togglePassword");
+    const password = document.getElementById(
+      "{{ form.password.id_for_label }}"
+    );
+
+    if (togglePassword && password) {
+      togglePassword.addEventListener("click", function () {
+        const type =
+          password.getAttribute("type") === "password" ? "text" : "password";
+        password.setAttribute("type", type);
+
+        // Toggle eye icon
+        this.querySelector("i").classList.toggle("bi-eye");
+        this.querySelector("i").classList.toggle("bi-eye-slash");
+      });
+    }
+  });
 </script>
 {% endblock %}
