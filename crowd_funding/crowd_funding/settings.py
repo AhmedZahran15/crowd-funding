@@ -136,7 +136,17 @@ LOGOUT_REDIRECT_URL = "login"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+if(DEBUG):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "euwemail5@gmail.com"
+EMAIL_HOST_PASSWORD = "lvee ryyz nxzz gdlq"
+DEFAULT_FROM_EMAIL = "Sharikna <noreply@sharikna.com>"
 
 from django.contrib.messages import constants as messages
 
