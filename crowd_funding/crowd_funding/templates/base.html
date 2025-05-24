@@ -76,18 +76,36 @@
         </li>
       </ul>
 
-      <form class="d-flex ms-lg-4 my-2 my-lg-0" role="search">
-        <input class="form-control me-2 rounded-pill" type="search" placeholder="Search projects..." aria-label="Search">
+      <form class="d-flex ms-lg-4 my-2 my-lg-0" role="search" action="{% url 'project_list' %}" method="get">
+        <input class="form-control me-2 rounded-pill" type="search" name="search" placeholder="Search projects..." aria-label="Search">
         <button class="btn btn-outline-success rounded-pill px-4" type="submit">Search</button>
       </form>
 
-      <div class="ms-lg-3 mt-3 mt-lg-0">
-        <a href="/profile/" class="d-inline-block text-decoration-none" title="My Profile">
-          <div class="rounded-circle bg-success text-white d-flex justify-content-center align-items-center"
-            style="width: 44px; height: 44px; font-size: 22px; transition: transform 0.2s;">
-            <i class="bi bi-person-circle"></i>
+      <div class="ms-lg-3 mt-3 mt-lg-0 d-flex align-items-center">
+        {% if user.is_authenticated %}
+          <div class="dropdown">
+            <a href="#" class="d-inline-block text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="My Profile">
+              <div class="rounded-circle bg-success text-white d-flex justify-content-center align-items-center"
+                style="width: 44px; height: 44px; font-size: 22px; transition: transform 0.2s;">
+                {% if user.profile_picture %}
+                  <img src="{{ user.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 44px; height: 44px; object-fit: cover;">
+                {% else %}
+                  <i class="bi bi-person-circle"></i>
+                {% endif %}
+              </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li><a class="dropdown-item" href="/profile/"><i class="bi bi-person me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="/projects/my-projects/"><i class="bi bi-folder me-2"></i>My Projects</a></li>
+              <li><a class="dropdown-item" href="/projects/my-donations/"><i class="bi bi-cash-coin me-2"></i>My Donations</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
           </div>
-        </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline-success rounded-pill me-2">Login</a>
+          <a href="{% url 'register' %}" class="btn btn-success rounded-pill">Sign Up</a>
+        {% endif %}
       </div>
     </div>
   </div>
