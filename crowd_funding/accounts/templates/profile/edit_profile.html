@@ -1,7 +1,5 @@
-{% extends "base.html" %}
-{% load static %}
-{% block title %}Edit Profile - Sharikna{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block title %}Edit Profile -
+Sharikna{% endblock %} {% block content %}
 <div class="container py-5" style="margin-top: 80px">
   <div class="row justify-content-center">
     <div class="col-lg-8">
@@ -10,21 +8,6 @@
           <h5 class="mb-0">Edit Profile</h5>
         </div>
         <div class="card-body p-4">
-          {% if messages %} {% for message in messages %}
-          <div
-            class="alert alert-{{ message.tags }} alert-dismissible fade show"
-            role="alert"
-          >
-            {{ message }}
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
-          {% endfor %} {% endif %}
-
           <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
@@ -154,7 +137,8 @@
                   class="form-label"
                   >Facebook Profile URL</label
                 >
-                {{ form.facebook_profile }} {% if form.facebook_profile.errors %}
+                {{ form.facebook_profile }} {% if form.facebook_profile.errors
+                %}
                 <div class="text-danger">
                   {{ form.facebook_profile.errors }}
                 </div>
