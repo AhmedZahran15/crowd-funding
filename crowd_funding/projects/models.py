@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal
 
 from accounts.models import User
 from django.db.models import Sum
@@ -42,7 +43,7 @@ class Project(models.Model):
     def can_be_cancelled(self):
         donations = self.donation_set.aggregate(total=Sum("amount"))
         total_donations = donations["total"] or 0
-        return total_donations < (self.total_target * 0.25)
+        return total_donations < (self.total_target * Decimal("0.25"))
 
 
 class ProjectImage(models.Model):
