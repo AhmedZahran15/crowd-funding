@@ -156,7 +156,15 @@
                     </div>
                     {% endif %}
                     <div class="card-body">
-                      <h5 class="card-title">{{ project.title }}</h5>
+                      <h5 class="card-title">
+                        {{ project.title }} {% if project.status != 'active' %}
+                        <span
+                          class="badge {% if project.status == 'cancelled' %}bg-danger{% else %}bg-success{% endif %} ms-1"
+                        >
+                          {{ project.status|title }}
+                        </span>
+                        {% endif %}
+                      </h5>
                       <p
                         class="card-text small text-muted mb-2 text-capitalize"
                       >
@@ -180,11 +188,21 @@
                           class="btn btn-sm btn-outline-success"
                           >View Details</a
                         >
-                        <a
-                          href="{% url 'edit_project' project.id %}"
-                          class="btn btn-sm btn-outline-secondary"
-                          >Edit</a
-                        >
+                        <div>
+                          <a
+                            href="{% url 'edit_project' project.id %}"
+                            class="btn btn-sm btn-outline-secondary"
+                            >Edit</a
+                          >
+                          {% if project.can_be_cancelled and project.status ==
+                          'active' %}
+                          <a
+                            href="{% url 'cancel_project' project.id %}"
+                            class="btn btn-sm btn-outline-danger ms-1"
+                            >Cancel</a
+                          >
+                          {% endif %}
+                        </div>
                       </div>
                     </div>
                   </div>
