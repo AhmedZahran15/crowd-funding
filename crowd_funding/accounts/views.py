@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from .forms import RegistrationForm, LoginForm, ProfileEditForm, DeleteAccountForm
-from .models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -11,9 +10,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from datetime import date
-from django.core.exceptions import ValidationError
-
+from projects.models import Project, Donation
 
 def login_view(request):
     if request.method == "POST":
@@ -49,10 +46,10 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    from projects.models import Project, Donation
-
     user_projects = Project.objects.filter(creator=request.user)
     user_donations = Donation.objects.filter(user=request.user)
+    for project in user_projects:
+        project.can_be_cancelled = project.can_be_cancelled()
 
     context = {
         "user": request.user,
