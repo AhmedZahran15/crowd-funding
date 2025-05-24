@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root{
+        margin: 5em 4em;
+    }
+
+    .carousel-inner {
+    height: 400px; 
+    }
+
+    .carousel-inner img {
+    height: 400px;
+    object-fit: cover; 
+    }
+
+    .link-muted { color: #aaa; } 
+    .link-muted:hover { color: #1266f1; }
+    .hidden-comment {
+    display: none !important;
+    }
+
+    /* Rating Styles */
+    .rating-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .rating-display {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .rating-display .stars {
+        display: flex;
+        gap: 1px;
+    }
+
+    .rating-display .star {
+        color: #ffc107;
+        font-size: 1.2rem;
+    }
+
+    .rating-display .star.empty {
+        color: #ddd;
+    }
+
+    .rating-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+
+    .user-rating-form {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+    }
+
+    .rating-submitted {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px 15px;
+        border-radius: 6px;
+        margin: 10px 0;
+    }
+
+    .btn-check:checked + .btn-outline-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container ">
+
+ <div class="row">
+        <div class="col-md-8 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <h2 class="mb-0">
+              {{title}}
+            </h2>
+            <div class="text-warning d-flex align-items-center fs-4 mt-2">
+                {% for i in "12345" %}
+                    {% if rating|floatformat:1 >= i %}
+                        <i class="bi bi-star-fill"></i>
+                    {% else %}
+                        <i class="bi bi-star"></i>
+                    {% endif %}
+                {% endfor %}
+                <span class="ms-1 text-dark" style="font-size: 1.2rem;">({{ rating }})</span>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+
+        <!-- Left: Video and Description -->
+    <div class="col-md-8 mt-4">
+
+        <div id="carouselExampleInterval" class="carousel slide "  data-bs-ride="carousel">
+        <div class="carousel-inner rounded-3">
+            {% if project.images.all %} {% for image in project.images.all %}
+
+            <div class="carousel-item {% if forloop.first %}active{% endif %}" data-bs-interval="3000">
+            <img src="{{ image.image.url }}" class="d-block w-100" alt="...">
+            </div>
+            {% endfor %} {% else %}
+            <div class="carousel-item active">
+                <div
+                  class="bg-light d-flex align-items-center justify-content-center"
+                  style="height: 400px"
+                >
+                  <div class="text-center">
+                    <i
+                      class="bi bi-image text-muted"
+                      style="font-size: 5rem"
+                    ></i>
+                    <p class="mt-3 text-muted">
+                      No images available for this project
+                    </p>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          
+            
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between">
+            <p class="pt-2 d-flex align-items-center gap-1">
+            <img src="{{ creator.image }}" alt="{{ creator.name }}" class="rounded-circle me-2" width="40" height="40">
+            Organized by <strong> {{ creator.name }}</strong>
+            </p>
+
+            <p class="text-muted">
+                Created on {{ created_at|date:"F j, Y" }}
+            </p>
+        </div>
+
+        <hr/>
+
+        <p class="mt-3" id="desc">
+            <span id="short-text">
+                {{ description|slice:":300" }}...
+            </span>
+            <span id="full-text" style="display:none;">
+                {{ description }}
+            </span>
+            <button id="readMoreBtn" class="btn btn-link p-0 d-block" onclick="toggleReadMore()">Read More</button>
+        </p>
+
+        <div class="d-flex align-items-center">
+            <button class="btn btn-success w-100 my-3">Donate now</button>
+            <button class="btn btn-light w-100 mb-3"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#shareModal">
+              Share
+            </button>
+        </div>
+
+        <hr/>
+
+        <!-- Rating Section -->
+        <div class="rating-section">
+            <h5 class="mb-3">Rate this Project</h5>
+            
+            <!-- Display Current Rating -->
+            <div class="rating-display mb-3">
+                <div class="stars">
+                    {% for i in "12345" %}
+                        <i class="bi {% if rating >= i %}bi-star-fill star{% else %}bi-star star empty{% endif %}"></i>
+                    {% endfor %}
+                </div>
+                <span class="rating-value">{{ rating|floatformat:1 }}/5</span>
+                <span class="rating-count">({{ total_ratings }} rating{{ total_ratings|pluralize }})</span>
+            </div>
+
+            <!-- User Rating Form -->
+            {% if user.is_authenticated %}
+                {% if user_rating %}
+                    <div class="rating-submitted">
+                        <i class="bi bi-check-circle"></i>
+                        You rated this project {{ user_rating }} star{{ user_rating|pluralize }}
+                    </div>
+                {% endif %}
+                
+                <div class="user-rating-form">
+                    <p class="mb-2">Rate this project:</p>
+                    <form method="POST" class="d-flex align-items-center gap-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="rate">
+                        
+                        <div class="d-flex gap-1">
+                            <input type="radio" class="btn-check" name="rating" value="1" id="star1">
+                            <label class="btn btn-outline-warning" for="star1">1⭐</label>
+                            
+                            <input type="radio" class="btn-check" name="rating" value="2" id="star2">
+                            <label class="btn btn-outline-warning" for="star2">2⭐</label>
+                            
+                            <input type="radio" class="btn-check" name="rating" value="3" id="star3">
+                            <label class="btn btn-outline-warning" for="star3">3⭐</label>
+                            
+                            <input type="radio" class="btn-check" name="rating" value="4" id="star4">
+                            <label class="btn btn-outline-warning" for="star4">4⭐</label>
+                            
+                            <input type="radio" class="btn-check" name="rating" value="5" id="star5">
+                            <label class="btn btn-outline-warning" for="star5">5⭐</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            {% else %}
+                <p>You must be <a href="{% url 'account_login' %}">logged in</a> to rate this project.</p>
+            {% endif %}
+        </div>
+
+        <hr/>
+
+                <button class="btn btn-light d-flex align-items-center border rounded-pill px-3 py-2 mt-3 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-flag" viewBox="0 0 16 16">
+                <path
+                    d="M14.778 3.22a.5.5 0 0 1 .222.415v7.304a.5.5 0 0 1-.777.416L10.447 9l-4.553 2.355V14.5a.5.5 0 0 1-1 0V2.5a.5.5 0 0 1 .777-.416L10.553 5l4.003-2.146a.5.5 0 0 1 .222-.055z" />
+            </svg>
+            <span class="ms-2">Report Project</span>
+        </button>
+        
+        <hr/>
+
+<section>
+  <div class="container py-3 text-body">
+    <div class="row d-flex justify-content-center">
+      <div class="col">
+<div class="card mb-4">
+          <div class="card-body">
+            <h5 class="mb-3">Add a Comment</h5>
+
+            {############### Check if the user is authenticated ################}
+            {% if user.is_authenticated %}
+                 <form method="POST" action="{% url 'projects:comment-add' %}">
+        {% csrf_token %} {{ form.non_field_errors }}
+
+        <div class="mb-3">
+          {{ form.project.label_tag }} {{ form.project }} {% if
+          form.project.errors %}
+          <div class="text-danger">{{ form.project.errors.0 }}</div>
+        </div>
+
+        <div class="mb-3">
+          {{ form.text.label_tag }} {{ form.text }} {% if form.text.errors %}
+          <div class="text-danger">{{ form.text.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div>{{ projects}}</div>
+
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+      </form>
+            {% else %}
+                {# Display a message and/or a link to log in if not authenticated #}
+                <p>You must be logged in to post a comment.</p>
+                <p><a href="{% url 'account_login' %}" class="btn btn-outline-primary">Log In</a></p>
+                {# Replace 'account_login' with the actual URL name for your login page if it's different #}
+            {% endif %}
+
+          </div>
+        </div>
+
+        <!--  comment display section -->
+<div id="comments-container">
+  {% for c in comments %}
+    <div class="d-flex flex-start mb-4 comment-item {% if forloop.counter0 >= 2 %}hidden-comment{% endif %}" data-index="{{ forloop.counter0 }}">
+      <img class="rounded-circle shadow-1-strong me-3"
+          src="{{ c.user.profile_picture }}"
+          alt="avatar" width="65" height="65" />
+      <div class="card w-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5>{{ c.user }}</h5>
+              <p class="small text-muted">{{ c.time }}</p>
+            </div>
+            
+            <!-- Edit/Delete buttons for comment owner -->
+            {% if c.user == user %}
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editCommentModal{{ c.id }}">
+                      <i class="bi bi-pencil me-2"></i>Edit
+                    </button>
+                  </li>
+                  <li>
+                    <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this comment?')">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="delete_comment">
+                      <input type="hidden" name="comment_id" value="{{ c.id }}">
+                      <button type="submit" class="dropdown-item text-danger">
+                        <i class="bi bi-trash me-2"></i>Delete
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
+            {% endif %}
+          </div>
+          
+          <p class="mt-2">{{ c.text }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Comment Modal -->
+    {% if c.user == user %}
+      <div class="modal fade" id="editCommentModal{{ c.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel{{ c.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editCommentModalLabel{{ c.id }}">Edit Comment</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+              <div class="modal-body">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_comment">
+                <input type="hidden" name="comment_id" value="{{ c.id }}">
+                <div class="mb-3">
+                  <label for="editComment{{ c.id }}" class="form-label">Your comment</label>
+                  <textarea class="form-control" id="editComment{{ c.id }}" name="comment" rows="4" required>{{ c.text }}</textarea>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+<!-- Show More Button -->
+<!-- <div class="text-center mt-3">
+  <button id="showMoreBtn" class="btn btn-outline-primary">Show More</button>
+</div> -->
+        <hr/>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+    </div>
+
+    <div class="col-md-4 mt-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4>£{{ raised|intcomma }} raised</h4>
+                <p class="text-muted">£{{ goal|intcomma }} goal · {{ comments.count }} comments</p>
+
+                    <div class="progress rounded-5" style="height: 20px;">
+                    <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        style="width: {{ percent|floatformat:0 }}%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="{{ percent|floatformat:0 }}"
+                        >
+                        £{{ raised|intcomma }} raised of £{{ goal|intcomma }}
+                    </div>
+                </div>
+
+
+                <button class="btn btn-success w-100 my-3">Donate now</button>
+                <button class="btn btn-light w-100 mb-3"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#shareModal">
+                  Share
+                </button>
+<!-- 
+                <p class="text-purple">📈 1.5K people just donated</p>
+
+
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-outline-secondary w-50">See all Donators</button>
+                </div> -->
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4 mt-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Project Stats</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Category</span>
+              <span class="badge bg-success rounded-pill"
+                >{{ Category }}</span
+              >
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Created</span>
+              <span>{{ created_at|date:"M d, Y" }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Deadline</span>
+              <span>{{ end_time|date:"M d, Y" }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Status</span>
+              <span class="badge bg-success rounded-pill">Active</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Tags</span>
+              <span class="badge bg-success rounded-pill">{{ project.tags.all|join:", " }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Rating</span>
+              <div class="d-flex align-items-center">
+                <div class="me-2">
+                  {% for i in "12345" %}
+                      <i class="bi {% if rating >= i %}bi-star-fill text-warning{% else %}bi-star text-muted{% endif %}" style="font-size: 0.8rem;"></i>
+                  {% endfor %}
+                </div>
+                <span class="badge bg-success rounded-pill">{{ rating|floatformat:1 }}/5</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+<!-- Share Modal -->
+<div
+  class="modal fade"
+  id="shareModal"
+  tabindex="-1"
+  aria-labelledby="shareModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shareModalLabel">Share this project</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-center gap-3">
+          <a
+            href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-primary"
+          >
+            <i class="bi bi-facebook"></i>
+          </a>
+          <a
+            href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ project.title|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-info"
+          >
+            <i class="bi bi-twitter"></i>
+          </a>
+          <a
+            href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-secondary"
+          >
+            <i class="bi bi-linkedin"></i>
+          </a>
+          <a
+            href="mailto:?subject={{ 'Check out this project: '|add:project.title|urlencode }}&body={{ 'I thought you might be interested in this project: '|add:request.build_absolute_uri|urlencode }}"
+            class="btn btn-outline-danger"
+          >
+            <i class="bi bi-envelope"></i>
+          </a>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="projectUrl"
+              value="{{ request.build_absolute_uri }}"
+              readonly
+            />
+            <button
+              class="btn btn-outline-success"
+              type="button"
+              id="copyButton"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+   
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleReadMore() {
+    const shortText = document.getElementById('short-text');
+    const fullText = document.getElementById('full-text');
+    const btn = document.getElementById('readMoreBtn');
+    
+    if (fullText.style.display === 'none') {
+      fullText.style.display = 'inline';
+      shortText.style.display = 'none';
+      btn.textContent = 'Read Less';
+    } else {
+      fullText.style.display = 'none';
+      shortText.style.display = 'inline';
+      btn.textContent = 'Read More';
+    }
+  }
+
+
+
+</script>
+{% endblock %}

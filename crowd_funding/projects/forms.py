@@ -42,7 +42,7 @@ class ProjectForm(forms.ModelForm):
         return
 class ProjectImageForm(forms.Form):
     files = forms.FileField(
-        widget=ClearableFileInput(attrs={'multiple': True}),
+        widget=ClearableFileInput(attrs={'multiple': False}),
         required=False
     )
    

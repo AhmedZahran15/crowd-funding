@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from datetime import datetime
-from .models import Project, Comment, Rating , Donation
+from ..models import Project, Comment, Rating , Donation
 from django.utils import timezone
 from django.db.models import Avg
 from django.db.models import Sum
