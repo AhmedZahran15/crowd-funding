@@ -63,6 +63,7 @@ def profile_view(request):
     }
     return render(request, "profile/profile.html", context)
 
+
 @login_required
 def edit_profile(request):
     from django import forms
@@ -101,7 +102,13 @@ def edit_profile(request):
                 "first_name": forms.TextInput(attrs={"class": "form-control"}),
                 "last_name": forms.TextInput(attrs={"class": "form-control"}),
                 "username": forms.TextInput(attrs={"class": "form-control"}),
-                "email": forms.EmailInput(attrs={"class": "form-control"}),
+                "email": forms.EmailInput(
+                    attrs={
+                        "class": "form-control",
+                        "readonly": "readonly",
+                        "disabled": "disabled",
+                    }
+                ),
                 "mobile_phone": forms.TextInput(attrs={"class": "form-control"}),
                 "profile_picture": forms.ClearableFileInput(
                     attrs={"class": "form-control"}
@@ -116,6 +123,7 @@ def edit_profile(request):
     if request.method == "POST":
         form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
+            form.instance.email = request.user.email
             form.save()
             messages.success(request, "Your profile has been updated successfully.")
             return redirect("profile")
