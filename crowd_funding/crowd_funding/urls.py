@@ -19,13 +19,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
-from projects.views import project_view
+from projects.views import project_view , donation_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('projects/<int:project_id>/', project_view, name='projects'),
-
+    path('projects/<int:project_id>/donate/', donation_view, name='donate'),
     path('auth/', include('accounts.urls')),
 ]
 if settings.DEBUG:

@@ -59,4 +59,21 @@ def project_view(request, project_id):
         'project': project,
     }
 
-    return render(request, 'fundraiser.html', context)
+    return render(request, 'project_details.html', context)
+
+
+def donation_view(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+
+    if request.method == 'POST':
+        amount = request.POST.get('amount')
+        if amount:
+            Donation.objects.create(
+                project=project,
+                user=request.user,
+                amount=amount,
+                timestamp=timezone.now()
+            )
+            return redirect('projects', project_id=project.id)
+
+    return render(request, 'donations.html', {'project': project})
