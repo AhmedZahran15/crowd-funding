@@ -1,6 +1,7 @@
 from django.db import models
 
 from accounts.models import User
+from django.db.models import Sum
 
 
 class Category(models.Model):
@@ -18,6 +19,12 @@ class Tag(models.Model):
 
 
 class Project(models.Model):
+    STATUS_CHOICES = (
+        ("active", "Active"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
+    )
+
     title = models.CharField(max_length=200)
     details = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -27,9 +34,15 @@ class Project(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     is_featured = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
 
     def __str__(self):
         return self.title
+
+    def can_be_cancelled(self):
+        donations = self.donation_set.aggregate(total=Sum("amount"))
+        total_donations = donations["total"] or 0
+        return total_donations < (self.total_target * 0.25)
 
 
 class ProjectImage(models.Model):
