@@ -189,11 +189,13 @@
                           >View Details</a
                         >
                         <div>
+                          {% if project.status != 'cancelled' %}
                           <a
                             href="{% url 'edit_project' project.id %}"
                             class="btn btn-sm btn-outline-secondary"
                             >Edit</a
                           >
+                          {% endif %}
                           {% if project.can_be_cancelled and project.status == 'active' %}
                           <a
                             href="{% url 'cancel_project' project.id %}"
