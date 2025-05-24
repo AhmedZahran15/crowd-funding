@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import RegistrationForm
+from .forms import RegistrationForm, LoginForm, ProfileEditForm, DeleteAccountForm
 from .models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -16,8 +16,6 @@ from django.core.exceptions import ValidationError
 
 
 def login_view(request):
-    from .forms import LoginForm
-
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -66,65 +64,12 @@ def profile_view(request):
 
 @login_required
 def edit_profile(request):
-    from django import forms
-
-    class ProfileEditForm(forms.ModelForm):
-        def clean_birthdate(self):
-            birthdate = self.cleaned_data.get("birthdate")
-            if birthdate:
-                if birthdate > date.today():
-                    raise ValidationError("Birthdate cannot be in the future.")
-                today = date.today()
-                age = (
-                    today.year
-                    - birthdate.year
-                    - ((today.month, today.day) < (birthdate.month, birthdate.day))
-                )
-                if age < 18:
-                    raise ValidationError("You must be at least 18 years old.")
-
-            return birthdate
-
-        class Meta:
-            model = User
-            fields = [
-                "first_name",
-                "last_name",
-                "username",
-                "email",
-                "mobile_phone",
-                "profile_picture",
-                "birthdate",
-                "facebook_profile",
-                "country",
-            ]
-            widgets = {
-                "first_name": forms.TextInput(attrs={"class": "form-control"}),
-                "last_name": forms.TextInput(attrs={"class": "form-control"}),
-                "username": forms.TextInput(attrs={"class": "form-control"}),
-                "email": forms.EmailInput(
-                    attrs={
-                        "class": "form-control",
-                        "readonly": "readonly",
-                        "disabled": "disabled",
-                    }
-                ),
-                "mobile_phone": forms.TextInput(attrs={"class": "form-control"}),
-                "profile_picture": forms.ClearableFileInput(
-                    attrs={"class": "form-control"}
-                ),
-                "birthdate": forms.DateInput(
-                    attrs={"class": "form-control", "type": "date"}
-                ),
-                "facebook_profile": forms.URLInput(attrs={"class": "form-control"}),
-                "country": forms.TextInput(attrs={"class": "form-control"}),
-            }
-
     if request.method == "POST":
         form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            form.instance.email = request.user.email
-            form.save()
+            user = form.save(commit=False)
+            user.email = request.user.email
+            user.save()
             messages.success(request, "Your profile has been updated successfully.")
             return redirect("profile")
     else:
@@ -185,3 +130,23 @@ def activate(request, uidb64, token):
         return render(request, "register/activation_success.html")
     else:
         return render(request, "register/activation_invalid.html")
+
+
+@login_required
+def delete_account(request):
+    if request.method == "POST":
+        form = DeleteAccountForm(request.POST, user=request.user)
+        if form.is_valid():
+            username = request.user.username
+            user = request.user
+            logout(request)
+            user.delete()
+
+            messages.success(
+                request, f"Account '{username}' has been permanently deleted."
+            )
+            return redirect("login")
+    else:
+        form = DeleteAccountForm(user=request.user)
+
+    return render(request, "profile/delete_account.html", {"form": form})
