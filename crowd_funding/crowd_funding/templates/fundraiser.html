@@ -2,12 +2,12 @@
 {% extends "base.html" %}
 {% load humanize %}
 
-{% block title %}Help Reg Pay Off His Debt{% endblock %}
+{% block title %}{{title}}{% endblock %}
 
 {% block extra_css %}
 <style>
     :root{
-        margin: 2em 4em;
+        margin: 5em 4em;
     }
 
     .carousel-inner {
@@ -36,14 +36,12 @@
  <div class="row">
         <div class="col-md-8 d-flex align-items-center justify-content-between flex-wrap gap-2">
             <h2 class="mb-0">
-                Help Reg pay off his debt! <span class="text-primary">#FreeReg</span>
+              {{title}}
             </h2>
             <div class="text-warning d-flex align-items-center fs-4 mt-2">
                 {% for i in "12345" %}
                     {% if rating|floatformat:1 >= i %}
                         <i class="bi bi-star-fill"></i>
-                    {% elif rating|floatformat:1 >= i|add:"-0.5" %}
-                        <i class="bi bi-star-half"></i>
                     {% else %}
                         <i class="bi bi-star"></i>
                     {% endif %}
@@ -62,15 +60,31 @@
 
         <div id="carouselExampleInterval" class="carousel slide "  data-bs-ride="carousel">
         <div class="carousel-inner rounded-3">
-            <div class="carousel-item active" data-bs-interval="3000">
-            <img src="https://images.unsplash.com/photo-1503264116251-35a269479413?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="d-block w-100" alt="...">
+            {% if project.images.all %} {% for image in project.images.all %}
+
+            <div class="carousel-item {% if forloop.first %}active{% endif %}" data-bs-interval="3000">
+            <img src="{{ image.image.url }}" class="d-block w-100" alt="...">
             </div>
-            <div class="carousel-item" data-bs-interval="3000">
-            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="d-block w-100" alt="...">
-            </div>
-            <div class="carousel-item" data-bs-interval="3000">
-            <img src="https://images.unsplash.com/photo-1503264116251-35a269479413?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="d-block w-100" alt="...">
-            </div>
+            {% endfor %} {% else %}
+            <div class="carousel-item active">
+                <div
+                  class="bg-light d-flex align-items-center justify-content-center"
+                  style="height: 400px"
+                >
+                  <div class="text-center">
+                    <i
+                      class="bi bi-image text-muted"
+                      style="font-size: 5rem"
+                    ></i>
+                    <p class="mt-3 text-muted">
+                      No images available for this project
+                    </p>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          
+            
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -84,7 +98,7 @@
 
         <div class="d-flex align-items-center justify-content-between">
             <p class="pt-2 d-flex align-items-center gap-1">
-            <img src="{{ creator.image }}" alt="{{ creator.name }}" class="rounded-circle me-2" width="40" height="40">
+            <img src="{{ creator.image.url }}" alt="{{ creator.name }}" class="rounded-circle me-2" width="40" height="40">
             Organized by <strong> {{ creator.name }}</strong>
             </p>
 
@@ -96,7 +110,6 @@
         <hr/>
 
         <p class="mt-3" id="desc">
-            <strong>(UPDATE: WE SUCCEEDED!! REG IS FREE!!)</strong><br>
             <span id="short-text">
                 {{ description|slice:":300" }}...
             </span>
@@ -108,7 +121,12 @@
 
         <div class="d-flex align-items-center">
             <button class="btn btn-success w-100 my-3">Donate now</button>
-            <button class="btn btn-light w-100 mb-3">Share</button>
+            <button class="btn btn-light w-100 mb-3"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#shareModal">
+              Share
+            </button>
         </div>
 
 
@@ -129,50 +147,58 @@
   <div class="container py-3 text-body">
     <div class="row d-flex justify-content-center">
       <div class="col">
-        <div class="card mb-4">
+<div class="card mb-4">
           <div class="card-body">
             <h5 class="mb-3">Add a Comment</h5>
-            <form method="POST">
-              {% csrf_token %}
-              <div class="mb-3">
-                <input type="text" class="form-control" name="name" placeholder="Your name" required>
-              </div>
-              <div class="mb-3">
-                <textarea class="form-control" name="comment" rows="3" placeholder="Your comment" required></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">Post Comment</button>
-            </form>
+
+            {############### Check if the user is authenticated ################}
+            {% if user.is_authenticated %}
+                <form method="POST">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                    <textarea class="form-control" name="comment" rows="3" placeholder="Your comment" required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+            {% else %}
+                {# Display a message and/or a link to log in if not authenticated #}
+                <p>You must be logged in to post a comment.</p>
+                <p><a href="{% url 'account_login' %}" class="btn btn-outline-primary">Log In</a></p>
+                {# Replace 'account_login' with the actual URL name for your login page if it's different #}
+            {% endif %}
+
           </div>
         </div>
 
-<div id="comments-container">
-  {% for c in comments %}
-    <div class="d-flex flex-start mb-4 comment-item {% if forloop.counter0 >= 2 %}hidden-comment{% endif %}" data-index="{{ forloop.counter0 }}">
-      <img class="rounded-circle shadow-1-strong me-3"
-           src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(32).webp"
-           alt="avatar" width="65" height="65" />
-      <div class="card w-100">
-        <div class="card-body p-4">
-          <h5>{{ c.name }}</h5>
-          <p class="small text-muted">{{ c.time }}</p>
-          <p>{{ c.comment }}</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <a href="#!" class="link-muted me-2"><i class="fas fa-thumbs-up me-1"></i>Like</a>
-              <a href="#!" class="link-muted"><i class="fas fa-thumbs-down me-1"></i>Dislike</a>
+        <div id="comments-container">
+          {% for c in comments %}
+
+            <div class="d-flex flex-start mb-4 comment-item {% if forloop.counter0 >= 2 %}hidden-comment{% endif %}" data-index="{{ forloop.counter0 }}">
+              <img class="rounded-circle shadow-1-strong me-3"
+                  src="{{ c.user.profile_picture.url }}"
+                  alt="avatar" width="65" height="65" />
+              <div class="card w-100">
+                <div class="card-body p-4">
+                  <h5>{{ c.user }}</h5>
+                  <p class="small text-muted">{{ c.time }}</p>
+                  <p>{{ c.text }}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <a href="#!" class="link-muted me-2"><i class="fas fa-thumbs-up me-1"></i>Like</a>
+                      <a href="#!" class="link-muted"><i class="fas fa-thumbs-down me-1"></i>Dislike</a>
+                    </div>
+                    <a href="#!" class="link-muted"><i class="fas fa-reply me-1"></i> Reply</a>
+                  </div>
+                </div>
+              </div>
             </div>
-            <a href="#!" class="link-muted"><i class="fas fa-reply me-1"></i> Reply</a>
-          </div>
+          {% endfor %}
         </div>
-      </div>
-    </div>
-  {% endfor %}
-</div>
 
 <!-- Show More Button -->
-<div class="text-center mt-3">
+<!-- <div class="text-center mt-3">
   <button id="showMoreBtn" class="btn btn-outline-primary">Show More</button>
-</div>
+</div> -->
         <hr/>
       </div>
     </div>
@@ -186,10 +212,10 @@
     <div class="col-md-4 mt-4">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h4>£180,115 raised</h4>
-                <p class="text-muted">£150K goal · 7.4K donations</p>
+                <h4>£{{ raised|intcomma }} raised</h4>
+                <p class="text-muted">£{{ goal|intcomma }} goal · {{ comments.count }} comments</p>
 
-                <div class="progress rounded-5" style="height: 20px;">
+                    <div class="progress rounded-5" style="height: 20px;">
                     <div
                         class="progress-bar bg-success"
                         role="progressbar"
@@ -202,20 +228,142 @@
                     </div>
                 </div>
 
-                <button class="btn btn-success w-100 my-3">Donate now</button>
-                <button class="btn btn-light w-100 mb-3">Share</button>
 
+                <button class="btn btn-success w-100 my-3">Donate now</button>
+                <button class="btn btn-light w-100 mb-3"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#shareModal">
+                  Share
+                </button>
+<!-- 
                 <p class="text-purple">📈 1.5K people just donated</p>
 
 
                 <div class="d-flex gap-2 mt-3">
                     <button class="btn btn-outline-secondary w-50">See all Donators</button>
-                </div>
+                </div> -->
             </div>
         </div>
+
+        <div class="card border-0 shadow-sm mb-4 mt-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Project Stats</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Category</span>
+              <span class="badge bg-success rounded-pill"
+                >{{ Category }}</span
+              >
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Created</span>
+              <span>{{ created_at|date:"M d, Y" }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Deadline</span>
+              <span>{{ end_time|date:"M d, Y" }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Status</span>
+              <span class="badge bg-success rounded-pill">Active</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center px-0"
+            >
+              <span>Tags</span>
+              <span class="badge bg-success rounded-pill">{{ project.tags.all|join:", " }}</span>
+            </li>
+          </ul>
+        </div>
+        </div>
+
     </div>
 </div>
 
+</div>
+
+<!-- Share Modal -->
+<div
+  class="modal fade"
+  id="shareModal"
+  tabindex="-1"
+  aria-labelledby="shareModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shareModalLabel">Share this project</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-center gap-3">
+          <a
+            href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-primary"
+          >
+            <i class="bi bi-facebook"></i>
+          </a>
+          <a
+            href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ project.title|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-info"
+          >
+            <i class="bi bi-twitter"></i>
+          </a>
+          <a
+            href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri|urlencode }}"
+            target="_blank"
+            class="btn btn-outline-secondary"
+          >
+            <i class="bi bi-linkedin"></i>
+          </a>
+          <a
+            href="mailto:?subject={{ 'Check out this project: '|add:project.title|urlencode }}&body={{ 'I thought you might be interested in this project: '|add:request.build_absolute_uri|urlencode }}"
+            class="btn btn-outline-danger"
+          >
+            <i class="bi bi-envelope"></i>
+          </a>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="projectUrl"
+              value="{{ request.build_absolute_uri }}"
+              readonly
+            />
+            <button
+              class="btn btn-outline-success"
+              type="button"
+              id="copyButton"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
    
 {% endblock %}
@@ -240,25 +388,63 @@
 
 
   document.addEventListener('DOMContentLoaded', function () {
-    const comments = document.querySelectorAll('.comment-item');
-    const showMoreBtn = document.getElementById('showMoreBtn');
-    let visibleCount = 3;
+    // const comments = document.querySelectorAll('.comment-item');
+    // const showMoreBtn = document.getElementById('showMoreBtn');
+    // let visibleCount = 3;
 
-    showMoreBtn.addEventListener('click', function () {
-      let nextVisible = visibleCount + 3;
-      for (let i = visibleCount; i < nextVisible && i < comments.length; i++) {
-        comments[i].style.display = 'flex';  // or 'block' depending on layout
-      }
-      visibleCount = nextVisible;
+    // showMoreBtn.addEventListener('click', function () {
+    //   let nextVisible = visibleCount + 3;
+    //   for (let i = visibleCount; i < nextVisible && i < comments.length; i++) {
+    //     comments[i].style.display = 'flex';  // or 'block' depending on layout
+    //   }
+    //   visibleCount = nextVisible;
 
-      if (visibleCount >= comments.length) {
-        showMoreBtn.style.display = 'none';  // Hide button if all shown
+    //   if (visibleCount >= comments.length) {
+    //     showMoreBtn.style.display = 'none';  // Hide button if all shown
+    //   }
+    // });
+
+    // if (comments.length <= 3) {
+    //   showMoreBtn.style.display = 'none';
+    // }
+
+        // Copy URL to clipboard
+    const copyButton = document.getElementById("copyButton");
+    const projectUrl = document.getElementById("projectUrl");
+
+    copyButton.addEventListener("click", function () {
+      // Use the Clipboard API for modern browsers
+      if (navigator.clipboard) {
+        navigator.clipboard
+          .writeText(projectUrl.value)
+          .then(() => {
+            // Change button text temporarily
+            const originalText = copyButton.innerHTML;
+            copyButton.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            setTimeout(function () {
+              copyButton.innerHTML = originalText;
+            }, 2000);
+          })
+          .catch((err) => {
+            console.error("Could not copy text: ", err);
+            // Fallback to old method
+            projectUrl.select();
+            document.execCommand("copy");
+          });
+      } else {
+        // Fallback for older browsers
+        projectUrl.select();
+        document.execCommand("copy");
+
+        // Change button text temporarily
+        const originalText = copyButton.innerHTML;
+        copyButton.innerHTML = '<i class="bi bi-check"></i> Copied!';
+        setTimeout(function () {
+          copyButton.innerHTML = originalText;
+        }, 2000);
       }
     });
 
-    if (comments.length <= 3) {
-      showMoreBtn.style.display = 'none';
-    }
   });
 
 </script>
