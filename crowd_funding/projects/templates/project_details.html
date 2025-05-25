@@ -762,6 +762,81 @@
       </div>
     </div>
   </div>
+
+  <!-- Similar Projects Section -->
+  {% if similar_projects %}
+  <div class="row mt-5">
+    <div class="col-12">
+      <h3 class="mb-4">Similar Projects</h3>
+      <div class="row">
+        {% for similar_project in similar_projects %}
+        <div class="col-md-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            {% if similar_project.images.first %}
+            <img
+              src="{{ similar_project.images.first.image.url }}"
+              class="card-img-top"
+              alt="{{ similar_project.title }}"
+              style="height: 200px; object-fit: cover"
+            />
+            {% else %}
+            <div
+              class="bg-light d-flex align-items-center justify-content-center"
+              style="height: 200px"
+            >
+              <i class="bi bi-image text-muted" style="font-size: 3rem"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+              <h6 class="card-title">{{ similar_project.title }}</h6>
+              <p class="card-text text-muted small">{{ similar_project.category.name }}</p>
+              <p class="card-text small">{{ similar_project.details|truncatewords:15 }}</p>
+              
+              {% with raised=similar_project.total_raised|default:0 %}
+              {% with percent=raised|floatformat:0|add:0 %}
+              {% with target=similar_project.total_target|floatformat:0|add:0 %}
+              {% with calculated_percent=raised|default:0 %}
+              <div class="progress mb-2" style="height: 8px">
+                <div
+                  class="progress-bar bg-success"
+                  role="progressbar"
+                  style="width: {% if target > 0 %}{% widthratio raised target 100 %}{% else %}0{% endif %}%;"
+                  aria-valuenow="{% if target > 0 %}{% widthratio raised target 100 %}{% else %}0{% endif %}"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <div class="d-flex justify-content-between small">
+                <span class="text-muted">${{ raised|floatformat:0 }}</span>
+                <span class="text-muted">${{ target }}</span>
+              </div>
+              {% endwith %}
+              {% endwith %}
+              {% endwith %}
+              {% endwith %}
+              
+              {% if similar_project.tags.all %}
+              <div class="mt-2">
+                {% for tag in similar_project.tags.all|slice:":3" %}
+                <span class="badge bg-light text-dark me-1" style="font-size: 0.7rem">{{ tag.name }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="card-footer bg-white border-top-0">
+              <a
+                href="{% url 'projects' similar_project.id %}"
+                class="btn btn-outline-success btn-sm w-100"
+                >View Project</a
+              >
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 <div
