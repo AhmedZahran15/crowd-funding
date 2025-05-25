@@ -13,4 +13,7 @@ urlpatterns = [
     path("<int:project_id>/report/", views.report_project, name="report_project"),
     path("<int:project_id>/rate/", views.rate_project, name="rate_project"),
     path("<int:project_id>/cancel/", views.cancel_project, name="cancel_project"),
+    path(
+        "comment/<int:comment_id>/report/", views.report_comment, name="report_comment"
+    ),
 ]
