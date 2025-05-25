@@ -1,0 +1,296 @@
+{% extends "base.html" %} 
+{% block title %}Create Project - Sharikna{% endblock%}
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <h3 class="mb-0">Create a New Project</h3>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="title" class="form-label">Project Title</label>
+              <input
+                type="text"
+                class="form-control"
+                id="title"
+                name="title"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="category" class="form-label">Category</label>
+              <select
+                class="form-select"
+                id="category"
+                name="category"
+                required
+              >
+                <option value="" selected disabled>Select a category</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="total_target" class="form-label"
+                >Funding Goal ($)</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="total_target"
+                name="total_target"
+                min="1"
+                step="0.01"
+                required
+              />
+              <div class="form-text">How much money do you need to raise?</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="start_time" class="form-label">Start Date</label>
+              <input
+                type="date"
+                class="form-control"
+                id="start_time"
+                name="start_time"
+                required
+              />
+              <div class="form-text">
+                When will your fundraising campaign start?
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="end_time" class="form-label">End Date</label>
+              <input
+                type="date"
+                class="form-control"
+                id="end_time"
+                name="end_time"
+                required
+              />
+              <div class="form-text">
+                When will your fundraising campaign end?
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="details" class="form-label">Project Details</label>
+              <textarea
+                class="form-control"
+                id="details"
+                name="details"
+                rows="5"
+                required
+              ></textarea>
+              <div class="form-text">
+                Describe your project in detail. What are you raising money for?
+                How will you use the funds?
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="tags_input" class="form-label">Tags</label>
+              <input
+                type="text"
+                class="form-control"
+                id="tags_input"
+                placeholder="Type tags and press Enter or comma to add them"
+              />
+              <input type="hidden" id="tags" name="tags" />
+              <div class="form-text">
+                Add relevant tags to help people find your project
+              </div>
+              <div class="tag-container mt-2" id="tagContainer">
+                <!-- Tags will be displayed here -->
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="images" class="form-label">Project Images</label>
+              <input
+                type="file"
+                class="form-control"
+                id="images"
+                name="images"
+                multiple
+                accept="image/*"
+              />
+              <div class="form-text">
+                Upload images that showcase your project. You can select
+                multiple images.
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">
+                Create Project
+              </button>
+              <a
+                href="{% url 'project_list' %}"
+                class="btn btn-outline-secondary"
+                >Cancel</a
+              >
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+  .tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .tag-item {
+    background-color: #198754;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .tag-remove {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tag-remove:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('start_time');
+    const endDateInput = document.getElementById('end_time');
+    const tagsInput = document.getElementById('tags_input');
+    const tagsHidden = document.getElementById('tags');
+    const tagContainer = document.getElementById('tagContainer');
+    let currentTags = [];
+    
+    const today = new Date().toISOString().split('T')[0];
+    startDateInput.min = today;
+    endDateInput.min = today;
+    
+    startDateInput.addEventListener('change', function() {
+        endDateInput.min = this.value;
+        if (endDateInput.value && endDateInput.value <= this.value) {
+            endDateInput.value = '';
+            alert('End date must be after start date');
+        }
+    });
+    
+    endDateInput.addEventListener('change', function() {
+        if (startDateInput.value && this.value <= startDateInput.value) {
+            this.value = '';
+            alert('End date must be after start date');
+        }
+    });
+    
+    function updateHiddenInput() {
+        tagsHidden.value = currentTags.join(', ');
+    }
+    
+    function renderTags() {
+        tagContainer.innerHTML = '';
+        currentTags.forEach((tag, index) => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tag}
+                <button type="button" class="tag-remove" onclick="removeTag(${index})">×</button>
+            `;
+            tagContainer.appendChild(tagElement);
+        });
+        updateHiddenInput();
+    }
+    
+    function addTag(tagName) {
+        const trimmedTag = tagName.trim().toLowerCase();
+        if (trimmedTag && !currentTags.includes(trimmedTag)) {
+            currentTags.push(trimmedTag);
+            renderTags();
+        }
+    }
+    
+    window.removeTag = function(index) {
+        currentTags.splice(index, 1);
+        renderTags();
+    };
+    
+    tagsInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const tagText = this.value.trim();
+            if (tagText) {
+                const tags = tagText.split(',').map(tag => tag.trim()).filter(tag => tag);
+                tags.forEach(tag => addTag(tag));
+                this.value = '';
+            }
+        }
+    });
+    
+    tagsInput.addEventListener('blur', function() {
+        const tagText = this.value.trim();
+        if (tagText) {
+            const tags = tagText.split(',').map(tag => tag.trim()).filter(tag => tag);
+            tags.forEach(tag => addTag(tag));
+            this.value = '';
+        }
+    });
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (startDate < today) {
+            e.preventDefault();
+            alert('Start date cannot be in the past');
+            return;
+        }
+        
+        if (endDate < today) {
+            e.preventDefault();
+            alert('End date cannot be in the past');
+            return;
+        }
+        
+        if (endDate <= startDate) {
+            e.preventDefault();
+            alert('End date must be after start date');
+            return;
+        }
+    });
+});
+</script>
+{% endblock %}
