@@ -234,12 +234,29 @@ def project_list(request):
     search_query = request.GET.get("search", "")
     category_id = request.GET.get("category", "")
 
-    projects = Project.objects.all().order_by("-start_time")
+    projects = (
+        Project.objects.all()
+        .annotate(total_raised=Sum("donation__amount", default=0))
+        .prefetch_related("tags", "category", "images")
+        .order_by("-start_time")
+    )
+    for project in projects:
+        if project.total_target > 0:
+            project.progress_percentage = (
+                project.total_raised / project.total_target
+            ) * 100
+        else:
+            project.progress_percentage = 0
+
     if search_query:
         projects = projects.filter(
-            Q(title__icontains=search_query)
-            | Q(details__icontains=search_query)
-            | Q(tags__name__icontains=search_query)
+            Q(title__icontains=search_query)  # Project title
+            | Q(details__icontains=search_query)  # Project description
+            | Q(tags__name__icontains=search_query)  # Tags (partial match)
+            | Q(category__name__icontains=search_query)  # Category name
+            | Q(creator__first_name__icontains=search_query)  # Creator first name
+            | Q(creator__last_name__icontains=search_query)  # Creator last name
+            | Q(creator__username__icontains=search_query)  # Creator username
         ).distinct()
     if category_id:
         projects = projects.filter(category_id=category_id)
