@@ -274,22 +274,6 @@ def project_list(request):
 
     return render(request, "project_list.html", context)
 
-
-def category_projects(request, category_id):
-    category = get_object_or_404(Category, id=category_id)
-    projects = Project.objects.filter(category=category).order_by("-start_time")
-    paginator = Paginator(projects, 9)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        "category": category,
-        "page_obj": page_obj,
-    }
-
-    return render(request, "category_projects.html", context)
-
-
 @login_required
 def create_project(request):
     if request.method == "POST":
