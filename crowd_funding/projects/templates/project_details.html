@@ -293,12 +293,13 @@
                   {% if user.is_authenticated %}
                   <form method="POST">
                     {% csrf_token %}
+                    <input type="hidden" name="action" value="add_comment">
                     <div class="mb-3">
                       <textarea
                         class="form-control"
                         name="comment"
                         rows="3"
-                        placeholder="Your comment"
+                        placeholder="Write your comment..."
                         required
                       ></textarea>
                     </div>
@@ -321,42 +322,200 @@
 
               <div id="comments-container">
                 {% for c in comments %}
-
-                <div
-                  class="d-flex flex-start mb-4 comment-item {% if forloop.counter0 >= 2 %}hidden-comment{% endif %}"
-                  data-index="{{ forloop.counter0 }}"
-                  {% if forloop.counter0 >= 2 %}style="display: none;"{% endif %}
-                >
-                  <img
-                    class="rounded-circle shadow-1-strong me-3 comment-avatar"
-                    src="{{ c.user.profile_picture.url }}"
-                    alt="avatar"
-                    width="65"
-                    height="65"
-                  />
+                <!-- Main Comment -->
+                <div class="d-flex flex-start mb-4 comment-item {% if forloop.counter0 >= 2 %}hidden-comment{% endif %}" 
+                     data-index="{{ forloop.counter0 }}" 
+                     {% if forloop.counter0 >= 2 %}style="display: none;"{% endif %}>
+                  
+                  <img class="rounded-circle shadow-1-strong me-3 comment-avatar"
+                       src="{% if c.user.profile_picture %}{{ c.user.profile_picture.url }}{% else %}/static/images/default-avatar.png{% endif %}"
+                       alt="avatar" width="65" height="65" />
+                  
                   <div class="card w-100 card-consistent">
                     <div class="card-body p-4">
-                      <h5>{{ c.user }}</h5>
-                      <p class="small text-muted">{{ c.timestamp }}</p>
-                      <p>{{ c.text }}</p>
-                      <div
-                        class="d-flex justify-content-between align-items-center"
-                      >
-                        <div class="d-flex align-items-center">
-                          <a href="#!" class="link-muted me-2"
-                            ><i class="fas fa-thumbs-up me-1"></i>Like</a
-                          >
-                          <a href="#!" class="link-muted"
-                            ><i class="fas fa-thumbs-down me-1"></i>Dislike</a
-                          >
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <h5>{{ c.user.get_full_name }}</h5>
+                          <p class="small text-muted">{{ c.timestamp }}</p>
                         </div>
-                        <a href="#!" class="link-muted"
-                          ><i class="fas fa-reply me-1"></i> Reply</a
-                        >
+                        
+                        <!-- Edit/Delete buttons for comment owner -->
+                        {% if c.user == user %}
+                          <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                              <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li>
+                                <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editCommentModal{{ c.id }}">
+                                  <i class="bi bi-pencil me-2"></i>Edit
+                                </button>
+                              </li>
+                              <li>
+                                <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this comment?')">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="action" value="delete_comment">
+                                  <input type="hidden" name="comment_id" value="{{ c.id }}">
+                                  <button type="submit" class="dropdown-item text-danger">
+                                    <i class="bi bi-trash me-2"></i>Delete
+                                  </button>
+                                </form>
+                              </li>
+                            </ul>
+                          </div>
+                        {% endif %}
                       </div>
+                      
+                      <p class="mt-2">{{ c.text }}</p>
+                      
+                      <!-- Comment Actions -->
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                          <a href="#!" class="link-muted me-2">
+                            <i class="fas fa-thumbs-up me-1"></i>Like
+                          </a>
+                          <a href="#!" class="link-muted">
+                            <i class="fas fa-thumbs-down me-1"></i>Dislike
+                          </a>
+                        </div>
+                        {% if user.is_authenticated %}
+                          <button class="btn btn-sm btn-link link-muted reply-btn" data-comment-id="{{ c.id }}" data-author-name="{{ c.user.get_full_name }}">
+                            <i class="fas fa-reply me-1"></i> Reply
+                          </button>
+                        {% endif %}
+                      </div>
+                      
+                      <!-- Reply Form (initially hidden) -->
+                      {% if user.is_authenticated %}
+                        <div class="reply-form mt-3" id="replyForm{{ c.id }}" style="display: none;">
+                          <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_comment">
+                            <input type="hidden" name="parent_id" value="{{ c.id }}">
+                            <div class="mb-2">
+                              <textarea name="comment" class="form-control" rows="2" placeholder="Write your reply to {{ c.user.get_full_name }}..." required></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                              <button type="submit" class="btn btn-primary btn-sm">Post Reply</button>
+                              <button type="button" class="btn btn-secondary btn-sm cancel-reply" data-comment-id="{{ c.id }}">Cancel</button>
+                            </div>
+                          </form>
+                        </div>
+                      {% endif %}
                     </div>
                   </div>
                 </div>
+                
+                <!-- Replies -->
+                {% for reply_data in comments_with_replies %}
+                  {% if reply_data.comment.id == c.id %}
+                    {% for reply in reply_data.replies %}
+                      <div class="d-flex flex-start mb-3 ms-5 reply-item">
+                        <img class="rounded-circle shadow-1-strong me-3"
+                             src="{% if reply.user.profile_picture %}{{ reply.user.profile_picture.url }}{% else %}/static/images/default-avatar.png{% endif %}"
+                             alt="avatar" width="50" height="50" />
+                        
+                        <div class="card w-100 bg-light">
+                          <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                              <div>
+                                <h6>{{ reply.user.get_full_name }}</h6>
+                                <p class="small text-muted">{{ reply.timestamp }}</p>
+                              </div>
+                              
+                              <!-- Edit/Delete for reply owner -->
+                              {% if reply.user == user %}
+                                <div class="dropdown">
+                                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots"></i>
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                    <li>
+                                      <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editCommentModal{{ reply.id }}">
+                                        <i class="bi bi-pencil me-2"></i>Edit
+                                      </button>
+                                    </li>
+                                    <li>
+                                      <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this reply?')">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_comment">
+                                        <input type="hidden" name="comment_id" value="{{ reply.id }}">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                          <i class="bi bi-trash me-2"></i>Delete
+                                        </button>
+                                      </form>
+                                    </li>
+                                  </ul>
+                                </div>
+                              {% endif %}
+                            </div>
+                            
+                            <p class="mb-1">{{ reply.text }}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Edit Reply Modal -->
+                      {% if reply.user == user %}
+                        <div class="modal fade" id="editCommentModal{{ reply.id }}" tabindex="-1">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">Edit Reply</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <form method="POST">
+                                <div class="modal-body">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="action" value="edit_comment">
+                                  <input type="hidden" name="comment_id" value="{{ reply.id }}">
+                                  <div class="mb-3">
+                                    <label class="form-label">Your reply</label>
+                                    <textarea class="form-control" name="comment" rows="3" required>{{ reply.text }}</textarea>
+                                  </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                  <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+                
+                <!-- Edit Main Comment Modal -->
+                {% if c.user == user %}
+                  <div class="modal fade" id="editCommentModal{{ c.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Edit Comment</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="POST">
+                          <div class="modal-body">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit_comment">
+                            <input type="hidden" name="comment_id" value="{{ c.id }}">
+                            <div class="mb-3">
+                              <label class="form-label">Your comment</label>
+                              <textarea class="form-control" name="comment" rows="4" required>{{ c.text }}</textarea>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                
                 {% endfor %}
                 
                 {% if comments.count > 2 %}
@@ -709,6 +868,42 @@
           ratingLabels[i].querySelector('i').classList.remove('bi-star-fill');
           ratingLabels[i].querySelector('i').classList.add('bi-star');
         }
+      });
+    });
+  });
+  
+  // Reply functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle reply button clicks
+    document.querySelectorAll('.reply-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const commentId = this.getAttribute('data-comment-id');
+        const replyForm = document.getElementById('replyForm' + commentId);
+        
+        // Hide all other reply forms
+        document.querySelectorAll('.reply-form').forEach(function(form) {
+          if (form.id !== 'replyForm' + commentId) {
+            form.style.display = 'none';
+          }
+        });
+        
+        // Toggle this reply form
+        if (replyForm.style.display === 'none' || replyForm.style.display === '') {
+          replyForm.style.display = 'block';
+          replyForm.querySelector('textarea').focus();
+        } else {
+          replyForm.style.display = 'none';
+        }
+      });
+    });
+    
+    // Handle cancel reply button clicks
+    document.querySelectorAll('.cancel-reply').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const commentId = this.getAttribute('data-comment-id');
+        const replyForm = document.getElementById('replyForm' + commentId);
+        replyForm.style.display = 'none';
+        replyForm.querySelector('textarea').value = '';
       });
     });
   });
