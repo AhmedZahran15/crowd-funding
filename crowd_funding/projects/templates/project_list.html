@@ -1,0 +1,403 @@
+{% extends "base.html" %} 
+{% load humanize %} 
+{% block title %}Projects - Sharikna{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-5">
+  <!-- Header Section -->
+  <div class="row mb-5">
+    <div class="col-lg-8">
+      <h1 class="display-4 fw-bold text-dark mb-3">Discover Projects</h1>
+      {% if search_query %}
+      <div class="alert alert-info border-0 shadow-sm">
+        <i class="bi bi-search me-2"></i>Search results for: <strong>"{{ search_query }}"</strong>
+        {% if projects.count == 0 %}
+        <br><small class="text-muted">Try different keywords or browse by category above.</small>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-lg-4">
+      <form method="get" class="d-flex">
+        <div class="input-group shadow-sm">
+          <input
+            type="text"
+            name="search"
+            class="form-control form-control-lg border-0 bg-light"
+            placeholder="Search projects by title, description, tags, category, or creator..."
+            value="{{ search_query }}"
+            style="border-top-left-radius: 15px; border-bottom-left-radius: 15px;"
+          />
+          <button type="submit" class="btn btn-success btn-lg px-4 rounded-end shadow">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
+      <small class="text-muted mt-2 d-block">
+        <i class="bi bi-info-circle me-1"></i>
+        Search across titles, descriptions, tags, categories, and creators
+      </small>
+    </div>
+  </div>
+
+  <!-- Category Filter Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-3">
+            <i class="bi bi-funnel me-2 text-success"></i>Filter by Category
+          </h5>
+          <div class="d-flex flex-wrap gap-2" role="group">
+            <a
+              href="{% url 'project_list' %}"
+              class="btn btn-success rounded-pill px-4 py-2 fw-semibold text-decoration-none {% if not selected_category %}shadow{% else %}btn-outline-success{% endif %}"
+              ><i class="bi bi-grid me-1"></i>All Categories</a
+            >
+            {% for category in categories %}
+            <a
+              href="{% url 'project_list' %}?category={{ category.id }}"
+              class="btn {% if selected_category == category.id %}btn-success shadow{% else %}btn-outline-success{% endif %} rounded-pill px-4 py-2 fw-semibold text-decoration-none"
+              >{{ category.name }}</a
+            >
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="row g-4">
+    {% if page_obj %} 
+    {% for project in page_obj %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card h-100 border-0 shadow-lg position-relative"
+           style="border-radius: 15px; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+           onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.1)'"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.1)'">
+        <!-- Project Image -->
+        {% if project.images.first %}
+        <div class="position-relative overflow-hidden" style="border-radius: 15px 15px 0 0;">
+          <img
+            src="{{ project.images.first.image.url }}"
+            class="card-img-top"
+            alt="{{ project.title }}"
+            style="height: 250px; object-fit: cover;"
+          />
+          <div class="position-absolute top-0 start-0 m-3">
+            <span class="badge bg-success text-white px-3 py-2 rounded-pill shadow-sm">
+              <i class="bi bi-tag-fill me-1"></i>{{ project.category.name }}
+            </span>
+          </div>
+        </div>
+        {% else %}
+        <div
+          class="bg-gradient d-flex align-items-center justify-content-center"
+          style="height: 250px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px 15px 0 0;"
+        >
+          <div class="text-center">
+            <i class="bi bi-image text-muted mb-2" style="font-size: 3rem;"></i>
+            <p class="text-muted mb-0">No Image Available</p>
+          </div>
+        </div>
+        <div class="position-absolute top-0 start-0 m-3">
+          <span class="badge bg-success text-white px-3 py-2 rounded-pill shadow-sm">
+            <i class="bi bi-tag-fill me-1"></i>{{ project.category.name }}
+          </span>
+        </div>
+        {% endif %}
+        <!-- Card Body -->
+        <div class="card-body p-4">
+          <h5 class="card-title fw-bold mb-3" style="color: #2c3e50; line-height: 1.4;">{{ project.title }}</h5>
+          
+          <p class="card-text mb-4" style="color: #6c757d; line-height: 1.6;">
+            {{ project.details|truncatechars:120 }}
+          </p>
+
+          <!-- Tags Section -->
+          {% if project.tags.all %}
+          <div class="mb-4">
+            <small class="text-muted d-block mb-2 fw-semibold">
+              <i class="bi bi-tags me-1 text-info"></i>Tags
+            </small>
+            <div class="d-flex flex-wrap gap-2">
+              {% for tag in project.tags.all %}
+              <a href="?search={{ tag.name }}" class="badge bg-light text-success border border-success rounded-pill px-3 py-1 text-decoration-none fw-semibold" style="font-size: 0.75rem;" title="Search for projects with tag: {{ tag.name }}">
+                #{{ tag.name }}
+              </a>
+              {% endfor %}
+            </div>
+            <div class="search-hint mt-2 p-2 bg-info bg-opacity-10 border border-info border-opacity-25 rounded">
+              <i class="bi bi-lightbulb me-1 text-info"></i>Click any tag to search for similar projects
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Progress Section -->
+          {% with raised=project.total_raised|default:0 %}
+          {% with percent=project.progress_percentage|floatformat:0 %}
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">            <small class="text-muted fw-semibold">
+              <i class="bi bi-graph-up text-success me-1"></i>Progress
+            </small>
+              <small class="badge bg-light text-dark">{{ percent }}%</small>
+            </div>
+            <div class="progress bg-light mb-3 rounded-pill" style="height: 8px;">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                style="width: {{ percent }}%;"
+                aria-valuenow="{{ percent }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+            <div class="d-flex justify-content-between">
+              <div class="text-center">
+                <small class="text-muted d-block">Raised</small>
+                <strong class="text-success">${{ raised|intcomma }}</strong>
+              </div>
+              <div class="text-center">
+                <small class="text-muted d-block">Goal</small>
+                <strong class="text-dark">${{ project.total_target|intcomma }}</strong>
+              </div>
+            </div>
+          </div>
+          {% endwith %} {% endwith %}
+        </div>
+        <!-- Card Footer -->
+        <div class="card-footer bg-transparent border-0 p-4 pt-0">
+          <div class="d-flex gap-2">
+            <a
+              href="{% url 'projects' project.id %}"
+              class="btn btn-success flex-grow-1 py-2 fw-semibold rounded-3 text-decoration-none"
+              ><i class="bi bi-eye me-2"></i>View Project</a
+            >
+            {% if user.is_authenticated and user == project.creator %}
+            <a
+              href="{% url 'edit_project' project.id %}"
+              class="btn btn-dark px-3 py-2 rounded-3 text-decoration-none"
+              title="Edit Project"
+              ><i class="bi bi-pencil-square"></i></a
+            >
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}    {% else %}
+    <!-- No Projects Found -->
+    <div class="col-12">
+      <div class="text-center py-5">
+        <div class="mb-4">
+          <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h3 class="text-muted mb-3">No Projects Found</h3>
+        <p class="text-muted mb-4">
+          {% if search_query %}
+          We couldn't find any projects matching "<strong>{{ search_query }}</strong>". Try different search terms or browse all categories.
+          {% else %}
+          There are no projects in this category yet. Check back later for exciting new projects!
+          {% endif %}
+        </p>
+        {% if search_query %}
+        <a href="{% url 'project_list' %}" class="btn btn-success rounded-3 text-decoration-none">
+          <i class="bi bi-arrow-left me-2"></i>Browse All Projects
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="row mt-5">
+    <div class="col-12">
+      <nav aria-label="Page navigation" class="d-flex justify-content-center">
+        <ul class="pagination pagination-lg gap-2">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a
+              class="page-link bg-success text-white border-success rounded-pill px-4 py-2 fw-semibold text-decoration-none"
+              href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.previous_page_number }}"
+              ><i class="bi bi-chevron-left"></i> Previous</a
+            >
+          </li>
+          {% else %}
+          <li class="page-item">
+            <span class="page-link bg-secondary text-white border-secondary rounded-pill px-4 py-2 fw-semibold opacity-50">
+              <i class="bi bi-chevron-left"></i> Previous
+            </span>
+          </li>
+          {% endif %} 
+          
+          {% for i in page_obj.paginator.page_range %} 
+          {% if page_obj.number == i %}
+          <li class="page-item">
+            <span class="page-link bg-dark text-white border-dark rounded-pill px-3 py-2 fw-bold">{{ i }}</span>
+          </li>
+          {% else %}
+          <li class="page-item">
+            <a
+              class="page-link bg-light text-success border-success rounded-pill px-3 py-2 fw-semibold text-decoration-none"
+              href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ i }}"
+              >{{ i }}</a
+            >
+          </li>
+          {% endif %} 
+          {% endfor %} 
+          
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a
+              class="page-link bg-success text-white border-success rounded-pill px-4 py-2 fw-semibold text-decoration-none"
+              href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}page={{ page_obj.next_page_number }}"
+              >Next <i class="bi bi-chevron-right"></i></a
+            >
+          </li>
+          {% else %}
+          <li class="page-item">
+            <span class="page-link bg-secondary text-white border-secondary rounded-pill px-4 py-2 fw-semibold opacity-50">
+              Next <i class="bi bi-chevron-right"></i>
+            </span>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Custom JavaScript for enhanced interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scrolling for category buttons
+    const categoryButtons = document.querySelectorAll('.btn');
+    categoryButtons.forEach(button => {
+        if (button.href && button.href.includes('category=')) {
+            button.addEventListener('click', function(e) {
+                // Add a subtle loading effect
+                if (!this.classList.contains('btn-success')) {
+                    const originalText = this.textContent.trim();
+                    this.innerHTML = '<i class="bi bi-arrow-clockwise spin me-1"></i>' + originalText;
+                }
+            });
+        }
+    });
+
+    // Enhanced tag interactions
+    const tagBadges = document.querySelectorAll('.badge[href*="search="]');
+    tagBadges.forEach(tag => {
+        tag.addEventListener('click', function(e) {
+            // Add loading effect when clicking tags
+            const originalText = this.textContent;
+            this.innerHTML = '<i class="bi bi-arrow-clockwise spin me-1"></i>' + originalText;
+        });
+    });
+
+    // Animate progress bars on scroll
+    const progressBars = document.querySelectorAll('.progress-bar');
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const progressObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const progressBar = entry.target;
+                const width = progressBar.style.width;
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.width = width;
+                    progressBar.style.transition = 'width 1.5s ease-in-out';
+                }, 100);
+            }
+        });
+    }, observerOptions);
+
+    progressBars.forEach(bar => {
+        progressObserver.observe(bar);
+    });
+
+    // Enhanced search input interactions
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('focus', function() {
+            this.closest('.input-group').style.transform = 'scale(1.02)';
+            this.closest('.input-group').style.transition = 'transform 0.3s ease';
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            this.closest('.input-group').style.transform = 'scale(1)';
+        });
+    }
+
+    // Add visual feedback for tag search
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+        // Highlight matching tags
+        tagBadges.forEach(tag => {
+            if (tag.textContent.toLowerCase().includes(searchQuery.toLowerCase())) {
+                tag.classList.remove('bg-light', 'text-success');
+                tag.classList.add('bg-warning', 'text-dark', 'fw-bold');
+                tag.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
+            }
+        });
+    }
+});
+</script>
+
+<style>
+/* Minimal custom styles to complement Bootstrap */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Smooth transitions */
+.input-group {
+    transition: transform 0.3s ease;
+}
+
+/* Card hover effects */
+.card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Progress bar animation */
+.progress-bar {
+    transition: width 1.5s ease-in-out;
+}
+
+/* Pagination hover effects */
+.page-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Button hover effects */
+.btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Tag hover effects */
+.badge[href]:hover {
+    transform: translateY(-2px) scale(1.05);
+    transition: all 0.3s ease;
+}
+</style>
+
+{% endblock %}
+
