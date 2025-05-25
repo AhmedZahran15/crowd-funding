@@ -56,26 +56,3 @@ class ProjectImageForm(forms.Form):
     files = forms.FileField(
         widget=ClearableFileInput(attrs={"multiple": False}), required=False
     )
-
-
-class CommentForm(forms.ModelForm):
-    parent = forms.ModelChoiceField(
-        queryset=Comment.objects.all(), required=False, widget=forms.HiddenInput()
-    )
-
-    class Meta:
-        model = Comment
-        fields = ["project", "text", "parent"]
-        widgets = {
-            "project": forms.HiddenInput(),
-            "text": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 3,
-                    "placeholder": "Write your comment...",
-                }
-            ),
-        }
-        labels = {
-            "text": "Your Comment",
-        }
