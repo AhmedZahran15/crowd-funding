@@ -311,7 +311,7 @@
                   <p>You must be logged in to post a comment.</p>
                   <p>
                     <a
-                      href="{% url 'account_login' %}"
+                      href="{% url 'login' %}"
                       class="btn btn-outline-primary"
                       >Log In</a
                     >
@@ -637,7 +637,7 @@
           {% else %}
           <p class="text-center">You must be logged in to rate this project.</p>
           <a
-            href="{% url 'account_login' %}"
+            href="{% url 'login' %}"
             class="btn btn-outline-primary w-100"
             >Log In</a
           >
