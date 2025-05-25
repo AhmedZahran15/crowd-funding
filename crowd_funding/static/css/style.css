@@ -1,15 +1,7 @@
-/* ================================================
-   CLEAN DJANGO CROWDFUNDING CSS
-   Most project list styling now uses Bootstrap utility classes
-   This file contains only essential site-wide styles
-   ================================================ */
-
-/* Global Site Styles */
 .heroImg {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   line-height: 1.8;
   background-image: url("/static/images/img3.jpg");
-  padding-top: 80px;
   padding-bottom: 80px;
   z-index: 2;
   position: relative;
