@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db import models
 from .models import (
     Project,
     Comment,
@@ -11,7 +12,7 @@ from .models import (
     Tag,
 )
 from django.utils import timezone
-from django.db.models import Avg, Sum, Q
+from django.db.models import Avg, Sum, Q, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -159,6 +160,28 @@ def project_view(request, project_id):
         except Rating.DoesNotExist:
             pass
     can_be_cancelled = project.can_be_cancelled()
+    similar_projects = []
+    if project.tags.exists():
+        similar_projects = (
+            Project.objects.filter(tags__in=project.tags.all(), status="active")
+            .exclude(id=project.id)
+            .distinct()
+            .annotate(
+                shared_tags_count=Count("tags", filter=Q(tags__in=project.tags.all())),
+                total_raised=Sum("donation__amount", default=0),
+            )
+            .order_by("-shared_tags_count", "-start_time")[:4]
+        )
+    if len(similar_projects) < 4:
+        category_projects = (
+            Project.objects.filter(category=project.category, status="active")
+            .exclude(id=project.id)
+            .exclude(id__in=[p.id for p in similar_projects])
+            .annotate(total_raised=Sum("donation__amount", default=0))
+            .order_by("-start_time")[: 4 - len(similar_projects)]
+        )
+
+        similar_projects = list(similar_projects) + list(category_projects)
 
     context = {
         "goal": project.total_target,
@@ -180,6 +203,7 @@ def project_view(request, project_id):
         "comments_with_replies": comments_with_replies,
         "project": project,
         "can_be_cancelled": can_be_cancelled,
+        "similar_projects": similar_projects,
     }
 
     return render(request, "project_details.html", context)
