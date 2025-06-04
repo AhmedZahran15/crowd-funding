@@ -1,4 +1,4 @@
-# 💸 Sharikna - Crowd funding Platform (Django)
+# 💸 Sharikna - Crowdfunding Platform (Django)
 
 A full-featured crowdfunding platform built with **Django**, where users can create fundraising projects, donate, and track progress. Ideal for individuals or organizations looking to raise funds for meaningful causes.
 
